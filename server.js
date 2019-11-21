@@ -17,16 +17,16 @@ const objection = require('objection');
 objection.Model.knex(knex);
 
 // Models
-const Authorization = require("./models/Authorization");
-const Driver = require("./models/Driver");
-const Drivers = require("./models/Drivers");
-const Location = require("./models/Location");
-const Passenger = require("./models/Passenger");
-const Passengers = require("./models/Passengers");
-const Ride = require("./models/Ride");
-const State = require("./models/State");
-const Vehicle = require("./models/Vehicle");
-const VehicleType = require("./models/VehicleType");
+const Authorization = require("./Models/Authorization");
+const Driver = require("./Models/Driver");
+const Drivers = require("./Models/Drivers");
+const Location = require("./Models/Location");
+const Passenger = require("./Models/Passenger");
+const Passengers = require("./Models/Passengers");
+const Ride = require("./Models/Ride");
+const State = require("./Models/State");
+const Vehicle = require("./Models/Vehicle");
+const VehicleType = require("./Models/VehicleType");
 
 // Hapi
 const Joi = require("@hapi/joi"); // Input validation
@@ -36,8 +36,11 @@ const server = Hapi.server({
     host: "localhost",
     port: 3000,
     routes: {
-        cors: true
-    }
+        cors: true,
+		files: {
+			relativeTo: Path.join(__dirname, 'public')
+			}
+	}
 });
 
 async function init() {
@@ -58,7 +61,16 @@ async function init() {
 
     // Configure routes.
     server.route([
-
+		{
+			method: "GET",
+			path: '/{param*}',
+			handler: {
+				directory: {
+					path: '.',
+					redirectToSlash: true
+				}
+			}
+		}
     ])
 
     // Start the server.
