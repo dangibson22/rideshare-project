@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add hapi-inert
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add vue-cli-service
 
 PATH: 
   C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\iCLS\;C:\Program Files\Intel\Intel(R) Management Engine Components\iCLS\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\Program Files (x86)\Yarn\bin\;C:\Program Files\Git\cmd;C:\Users\Daniel\AppData\Local\Microsoft\WindowsApps;C:\Users\Daniel\AppData\Roaming\npm;C:\Users\Daniel\AppData\Local\Yarn\bin
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/hapi-inert: Not found
+  Error: https://registry.yarnpkg.com/vue-cli-service: Not found
       at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:66035:18)
       at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:140564:22)
       at Request.emit (events.js:210:5)
@@ -32,19 +32,21 @@ npm manifest:
     "version": "1.0.0",
     "dependencies": {
       "@hapi/hapi": "^18.4.0",
+      "@hapi/inert": "^5.2.2",
       "blipp": "^4.0.1",
       "hapi-pino": "^6.3.0",
       "knex": "^0.20.2",
       "objection": "^1.6.11",
       "pg": "^7.13.0",
       "vue": "^2.6.10",
+      "vue-router": "^3.1.3",
       "vuetify": "^2.1.10"
     },
     "devDependencies": {
       "nodemon": "^1.19.4"
     },
     "scripts": {
-      "ui-awtch": "vue-cli-service serve",
+      "ui-watch": "vue-cli-service serve",
       "watch": "nodemon server.js"
     }
   }
@@ -191,6 +193,18 @@ Lockfile:
     version "8.5.0"
     resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-8.5.0.tgz#2f9ce301c8898e1c3248b0a8564696b24d1a9a5a"
     integrity sha512-7XYT10CZfPsH7j9F1Jmg1+d0ezOux2oM2GfArAzLwWe4mE2Dr3hVjsAL6+TFY49RRJlCdJDMw3nJsLFroTc8Kw==
+  
+  "@hapi/inert@^5.2.2":
+    version "5.2.2"
+    resolved "https://registry.yarnpkg.com/@hapi/inert/-/inert-5.2.2.tgz#3ba4d93afc6d5b42e4bab19cd09556ddd49b5dac"
+    integrity sha512-8IaGfAEF8SwZtpdaTq0G3aDPG35ZTfWKjnMNniG2N3kE+qioMsBuImIGxna8TNQ+sYMXYK78aqmvzbQHno8qSQ==
+    dependencies:
+      "@hapi/ammo" "3.x.x"
+      "@hapi/boom" "7.x.x"
+      "@hapi/bounce" "1.x.x"
+      "@hapi/hoek" "8.x.x"
+      "@hapi/joi" "16.x.x"
+      lru-cache "4.1.x"
   
   "@hapi/iron@5.x.x":
     version "5.1.4"
@@ -1510,7 +1524,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
     integrity sha512-G2Lj61tXDnVFFOi8VZds+SoQjtQC3dgokKdDG2mTm1tx4m50NUHBOZSBwQQHyy0V12A0JTG4icfZQH+xPyh8VA==
   
-  lru-cache@^4.0.1:
+  lru-cache@4.1.x, lru-cache@^4.0.1:
     version "4.1.5"
     resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.5.tgz#8bbe50ea85bed59bc9e33dcab8235ee9bcf443cd"
     integrity sha512-sWZlbEP2OsHNkXrMl5GYk/jKk70MBng6UU4YI/qGDYbgf6YbP4EvmqISbXCoJiRKs+1bSpFHVgQxvJ17F2li5g==
@@ -2589,6 +2603,11 @@ Lockfile:
     integrity sha512-amh9CCg3ZxkzQ48Mhcb8iX7xpAfYJgePHxWMQCBWECpOSqJUXgY26ncA61UTV0BkPqfhcy6mzwCIoP4ygxpW8w==
     dependencies:
       homedir-polyfill "^1.0.1"
+  
+  vue-router@^3.1.3:
+    version "3.1.3"
+    resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.1.3.tgz#e6b14fabc0c0ee9fda0e2cbbda74b350e28e412b"
+    integrity sha512-8iSa4mGNXBjyuSZFCCO4fiKfvzqk+mhL0lnKuGcQtO1eoj8nq3CmbEG8FwK5QqoqwDgsjsf1GDuisDX4cdb/aQ==
   
   vue@^2.6.10:
     version "2.6.10"
