@@ -17,19 +17,19 @@ const objection = require('objection');
 objection.Model.knex(knex);
 
 // Models
-const Authorization = require("./Models/Authorization");
-const Driver = require("./Models/Driver");
-const Drivers = require("./Models/Drivers");
-const Location = require("./Models/Location");
-const Passenger = require("./Models/Passenger");
-const Passengers = require("./Models/Passengers");
-const Ride = require("./Models/Ride");
-const State = require("./Models/State");
-const Vehicle = require("./Models/Vehicle");
-const VehicleType = require("./Models/VehicleType");
+//const Authorization = require("./Models/Authorization");
+//const Driver = require("./Models/Driver");
+//const Drivers = require("./Models/Drivers");
+//const Location = require("./Models/Location");
+//const Passenger = require("./Models/Passenger");
+//const Passengers = require("./Models/Passengers");
+//const Ride = require("./Models/Ride");
+//const State = require("./Models/State");
+//const Vehicle = require("./Models/Vehicle");
+//const VehicleType = require("./Models/VehicleType");
 
 // Hapi
-const Joi = require("@hapi/joi"); // Input validation
+//const Joi = require("@hapi/joi"); // Input validation
 const Hapi = require("@hapi/hapi"); // Server
 
 const server = Hapi.server({
@@ -70,8 +70,68 @@ async function init() {
 					redirectToSlash: true
 				}
 			}
-		}
-    ])
+		},
+        {
+            method: "POST",
+            path: "/drivers",
+            config: {
+                description: "Sign up for an account",
+                validate: {
+                    /*
+                    payload: Joi.object({
+                        firstName: Joi.string().required(),
+                        lastName: Joi.string().required(),
+                        phone: Joi.string().required(),
+                        licenseNumber: Joi.string().required()
+                    })
+
+                     */
+                }
+            },
+            handler: () => {
+                return {
+                    ok: true,
+                    msge: "just testing!"
+                }
+            }
+            // eslint-disable-next-line no-unused-vars
+            /*
+            handler: async (request, h) => {
+                const existingDriver = await Driver.query()
+                    .where("firstname", request.payload.firstName)
+                    .where("lastname", request.payload.lastName)
+                    .where("phone", request.payload.phone)
+                    .where("licensenumber", request.payload.licenseNumber);
+                if (existingDriver) {
+                    return {
+                        ok: false,
+                        msge: `You have already been registered with this vehicle!`
+                    };
+                }
+
+                const newDriver = await Driver.query().insert({
+                    firstname: request.payload.firstName,
+                    lastname: request.payload.lastName,
+                    phone: request.payload.phone,
+                    licensenumber: request.payload.licenseNumber
+                });
+
+                if (newDriver) {
+                    return {
+                        ok: true,
+                        msge: `Signed up ${request.payload.firstName} ${request.payload.lastName} with vehicle `
+                    }
+                } else {
+                    return {
+                        ok: false,
+                        msge: `big oof`
+                    }
+                }
+            }
+
+             */
+        }
+    ]);
 
     // Start the server.
     await server.start();

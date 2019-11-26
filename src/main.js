@@ -12,6 +12,7 @@ Vue.prototype.$axios = axiosClient;
 new Vue({
     el: "#app",
     data: {
+        currentUser: null
     },
     router,
     vuetify,
