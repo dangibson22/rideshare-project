@@ -18,7 +18,7 @@ objection.Model.knex(knex);
 
 // Models
 //const Authorization = require("./Models/Authorization");
-//const Driver = require("./Models/Driver");
+const Driver = require("./Models/Driver");
 //const Drivers = require("./Models/Drivers");
 //const Location = require("./Models/Location");
 //const Passenger = require("./Models/Passenger");
@@ -88,14 +88,7 @@ async function init() {
                      */
                 }
             },
-            handler: () => {
-                return {
-                    ok: true,
-                    msge: "just testing!"
-                }
-            }
             // eslint-disable-next-line no-unused-vars
-            /*
             handler: async (request, h) => {
                 const existingDriver = await Driver.query()
                     .where("firstname", request.payload.firstName)
@@ -128,8 +121,6 @@ async function init() {
                     }
                 }
             }
-
-             */
         }
     ]);
 

@@ -85,7 +85,8 @@ export default {
                 phone: [val => /\d{3}-\d{3}-\d{4}/.test(val) || "Invalid number - ex. 123-456-7890"],
                 licenseNumber: [
                     // idk how license plates work
-                    val => /^([A-Za-z]{3}\d{3})|([A-Za-z]{2}\d{4})$/.test(val) || "Invalid license plate - must be AA9999 or AAA999"
+                    val => /^([A-Za-z]{3}\d{3})|([A-Za-z]{2}\d{4})$/.test(val) ||
+                        "Invalid license plate - must be AA9999 or AAA999"
                 ]
             }
         }
