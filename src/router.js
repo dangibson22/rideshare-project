@@ -7,6 +7,7 @@ import RidesAdmin from "./pages/admin/rides-admin.vue";
 import VehicleAdmin from "./pages/admin/vehicles-admin.vue";
 import Passenger from "./pages/Passenger.vue";
 import Driver from "./pages/Driver.vue";
+import DriverSignUp from "./pages/DriverSignUp.vue";
 import DriverTools from "./pages/DriverTools.vue";
 import About from "./pages/About.vue";
 
@@ -21,8 +22,9 @@ export default new Router({
         { name: "rides-admin", path: "/admin/rides", component: RidesAdmin },
         { name: "vehicles-admin", path: "/admin/vehicles", component: VehicleAdmin },
         { name: "passenger", path: "/find-ride", component: Passenger },
-        { name: "driver-sign-up", path: "/become-driver", component: Driver },
-        { name: "driver-tools", path: "/driver-tools", component: DriverTools },
+        { name: "driver", path: "/driver", component: Driver },
+        { name: "driver-sign-up", path: "/driver/sign-up", component: DriverSignUp },
+        { name: "driver-tools", path: "/driver/tools", component: DriverTools },
         { name: "about", path: "/about-us", component: About }
     ]
 })
