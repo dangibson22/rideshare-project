@@ -73,7 +73,7 @@ async function init() {
 		},
         {
             method: "POST",
-            path: "/drivers",
+            path: "/add-driver",
             config: {
                 description: "Sign up for an account",
                 validate: {

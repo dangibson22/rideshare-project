@@ -1,4 +1,6 @@
 const { Model } = require("objection");
+const Drivers = require("./Drivers");
+const Authorization = require("./Authorization");
 
 class Driver extends Model {
     static get tableName() {

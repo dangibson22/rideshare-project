@@ -97,7 +97,7 @@ export default {
             this.driverCreated = false;
 
             this.$axios
-                .post("/drivers", {
+                .post("/add-driver", {
                     firstName: this.newDriver.firstName,
                     lastName: this.newDriver.lastName,
                     phone: this.newDriver.phone,
