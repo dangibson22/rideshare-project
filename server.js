@@ -73,7 +73,7 @@ async function init() {
 		},
         {
             method: "POST",
-            path: "/add-driver",
+            path: "/driver/sign-up",
             config: {
                 description: "Sign up for an account",
                 validate: {
@@ -95,7 +95,8 @@ async function init() {
                     .where("firstname", request.payload.firstName)
                     .where("lastname", request.payload.lastName)
                     .where("phone", request.payload.phone)
-                    .where("licensenumber", request.payload.licenseNumber);
+                    .where("licensenumber", request.payload.licenseNumber)
+                    .first();
                 if (existingDriver) {
                     return {
                         ok: false,

@@ -5,7 +5,7 @@ const { Location } = require("./Location");
 
 class Ride extends Model {
     static get tableName() {
-        return 'Ride';
+        return 'ride';
     }
     static get relationMappings() {
         return {
@@ -13,32 +13,32 @@ class Ride extends Model {
                 relation: Model.HasManyRelations,
                 modelClass: Drivers,
                 join: {
-                    from: 'Ride.id',
-                    to: 'Drivers.rideId'
+                    from: 'ride.id',
+                    to: 'drivers.rideid'
                 }
             },
             vehicle: {
                 relation: Model.BelongsToOneRelation,
                 modelClass: Vehicle,
                 join: {
-                    from: 'Ride.vehicleId',
-                    to: 'Vehicle.id'
+                    from: 'ride.vehicleid',
+                    to: 'vehicle.id'
                 }
             },
             fromLocations: {
                 relation: Model.BelongsToOneRelation,
                 modelClass: Location,
                 join: {
-                    from: 'Ride.fromLocationId',
-                    to: 'Location.id'
+                    from: 'ride.fromlocationid',
+                    to: 'location.id'
                 }
             },
             toLocations: {
                 relation: Model.BelongsToOneRelation,
                 modelClass: Location,
                 join: {
-                    from: 'Ride.toLocationId',
-                    to: 'Location.id'
+                    from: 'ride.tolocationid',
+                    to: 'location.id'
                 }
             }
         }

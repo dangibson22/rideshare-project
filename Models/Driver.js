@@ -4,7 +4,7 @@ const { Authorization } = require("./Authorization");
 
 class Driver extends Model {
     static get tableName() {
-        return "Driver";
+        return "driver";
     }
     static get relationMappings() {
         return {
@@ -12,16 +12,16 @@ class Driver extends Model {
                 relation: Model.HasManyRelation,
                 modelClass: Drivers,
                 join: {
-                    from: 'Driver.id',
-                    to: 'Drivers.driverId'
+                    from: 'driver.id',
+                    to: 'drivers.driverid'
                 }
             },
             authorizations: {
                 relation: Model.HasManyRelation,
                 modelClass: Authorization,
                 join: {
-                    from: 'Driver.id',
-                    to: 'Authorization.driverId'
+                    from: 'driver.id',
+                    to: 'authorization.driverid'
                 }
             }
         }

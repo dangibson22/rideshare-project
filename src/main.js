@@ -9,6 +9,8 @@ const axiosClient = axios.create({
 });
 Vue.prototype.$axios = axiosClient;
 
+console.log("main");
+
 new Vue({
     el: "#app",
     data: {

@@ -3,7 +3,7 @@ const { Location } = require("./Location");
 
 class State extends Model {
     static get tableName() {
-        return 'State';
+        return 'state';
     }
     static get relationMappings() {
         return {
@@ -11,8 +11,8 @@ class State extends Model {
                 relation: Model.HasManyRelations,
                 modelClass: Location,
                 join: {
-                    from: 'State.abbreviation',
-                    to: 'Location.state'
+                    from: 'state.abbreviation',
+                    to: 'location.state'
                 }
             }
         }

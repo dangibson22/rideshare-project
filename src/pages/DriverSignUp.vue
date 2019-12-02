@@ -96,7 +96,7 @@ export default {
             this.driverCreated = false;
 
             this.$axios
-                .post("/add-driver", {
+                .post("/driver/sign-up", {
                     firstName: this.newDriver.firstName,
                     lastName: this.newDriver.lastName,
                     phone: this.newDriver.phone,
@@ -123,9 +123,6 @@ export default {
 
         hideDialog: function() {
             this.dialogVisible = false;
-            if (this.driverCreated) {
-                // nav away from sign-up? idk if we want this
-            }
         }
     },
 };

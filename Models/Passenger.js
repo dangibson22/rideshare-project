@@ -3,7 +3,7 @@ const { Passengers } = require("./Passengers");
 
 class Passenger extends Model {
     static get tableName() {
-        return 'Passenger';
+        return 'passenger';
     }
     static get relationMappings() {
         return {
@@ -11,8 +11,8 @@ class Passenger extends Model {
                 relation: Model.HasManyRelations,
                 modelClass: Passengers,
                 join: {
-                    from: 'Passenger.id',
-                    to: 'Passengers.passengerId'
+                    from: 'passenger.id',
+                    to: 'passengers.passengerid'
                 }
             }
         }
