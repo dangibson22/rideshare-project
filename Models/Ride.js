@@ -1,7 +1,7 @@
 const { Model } = require('objection');
-const Drivers = require("./Drivers");
-const Vehicle = require("./Vehicle");
-const Location = require("./Location");
+const { Drivers } = require("./Drivers");
+const { Vehicle } = require("./Vehicle");
+const { Location } = require("./Location");
 
 class Ride extends Model {
     static get tableName() {

@@ -1,7 +1,7 @@
 const { Model } = require('objection');
-const Authorization = require("./Authorization");
-const Ride = require("./Ride");
-const VehicleType = require("./VehicleType");
+const { Authorization } = require("./Authorization");
+const { Ride } = require("./Ride");
+const { VehicleType } = require("./VehicleType");
 
 class Vehicle extends Model {
     static get tableName() {

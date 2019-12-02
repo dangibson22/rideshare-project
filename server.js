@@ -90,6 +90,7 @@ async function init() {
             },
             // eslint-disable-next-line no-unused-vars
             handler: async (request, h) => {
+                console.log("Got here!");
                 const existingDriver = await Driver.query()
                     .where("firstname", request.payload.firstName)
                     .where("lastname", request.payload.lastName)
