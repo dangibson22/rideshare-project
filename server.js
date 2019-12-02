@@ -128,11 +128,11 @@ async function init() {
 
     // Start the server.
     await server.start();
-
-    process.on("unhandledRejection", err => {
-        server.logger().error(err);
-        process.exit(1);
-    });
 }
+
+process.on("unhandledRejection", err => {
+    server.logger().error(err);
+    process.exit(1);
+});
 
 init();
