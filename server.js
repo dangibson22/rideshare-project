@@ -85,8 +85,7 @@ async function init() {
                     })
                 }
             },
-            // eslint-disable-next-line no-unused-vars
-            handler: async (request, h) => {
+            handler: async (request) => {
                 const existingDriver = await Driver.query()
                     .where("licensenumber", request.payload.licenseNumber)
                     .first();
@@ -191,12 +190,13 @@ async function init() {
         },
         {
             method: "PUT",
-            path: "/vehicles",
+            path: "/vehicles/{id}",
             options: {
                 description: "Update a vehicle"
             },
             handler: async (request) => {
                 const plateExists = await Vehicle.query()
+                    .whereNot("id", request.params.id)
                     .where("licensenumber", request.payload.licenseNumber)
                     .first();
 
@@ -208,7 +208,7 @@ async function init() {
                 }
 
                 const updateVehicle = await Vehicle.query()
-                    .where("id", request.payload.id)
+                    .where("id", request.params.id)
                     .update({
                         make: request.payload.make,
                         model: request.payload.model,

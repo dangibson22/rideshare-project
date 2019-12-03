@@ -26,6 +26,14 @@
                                 </template>
                                 <span>Edit vehicle</span>
                             </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon small class="ml-2" v-on="on">
+                                        mdi-plus
+                                    </v-icon>
+                                </template>
+                                <span>Add authorized driver</span>
+                            </v-tooltip>
                         </td>
                     </tr>
                 </template>
@@ -75,7 +83,7 @@
                                         label="License plate number"
                                 ></v-text-field>
                                 <v-btn right color="primary" :disabled="!valid" v-on:click="handleUpdateVehicle">
-                                    Add Vehicle
+                                    Update Vehicle
                                 </v-btn>
                                 <v-btn right text color="primary" @click="hideEdit">Cancel</v-btn>
                             </v-form>
@@ -266,8 +274,7 @@ export default {
             this.vehicleEdited = false;
 
             this.$axios
-                .put("/vehicles", {
-                    id: this.editingVehicle.id,
+                .put(`/vehicles/${this.editingVehicle.id}`, {
                     make: this.editingVehicle.make,
                     model: this.editingVehicle.model,
                     color: this.editingVehicle.color,
