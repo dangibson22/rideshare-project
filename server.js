@@ -74,7 +74,7 @@ async function init() {
         {
             method: "POST",
             path: "/driver",
-            config: {
+            options: {
                 description: "Add a driver",
                 validate: {
                     payload: Joi.object({
@@ -87,7 +87,6 @@ async function init() {
             },
             // eslint-disable-next-line no-unused-vars
             handler: async (request, h) => {
-                console.log("Got here!");
                 const existingDriver = await Driver.query()
                     .where("licensenumber", request.payload.licenseNumber)
                     .first();
@@ -121,7 +120,7 @@ async function init() {
         {
             method: "GET",
             path: "/driver",
-            config: {
+            options: {
                 description: "View all drivers"
             },
             handler: () => {
@@ -131,11 +130,107 @@ async function init() {
         {
             method: "GET",
             path: "/vehicles",
-            config: {
+            options: {
                 description: "View all vehicles"
             },
             handler: () => {
                 return Vehicle.query();
+            }
+        },
+        {
+            method: "POST",
+            path: "/vehicles",
+            options: {
+                description: "Add a new vehicle",
+                validate: {
+                    payload: Joi.object({
+                        make: Joi.string().required(),
+                        model: Joi.string().required(),
+                        color: Joi.string().required(),
+                        capacity: Joi.number().integer().min(0).required(),
+                        mpg: Joi.number().integer().min(0).required(),
+                        licenseState: Joi.string().required(),
+                        licenseNumber: Joi.string().required()
+                    })
+                }
+            },
+            handler: async (request) => {
+                const existingVehicle = await Vehicle.query()
+                    .where("licensenumber", request.payload.licenseNumber)
+                    .where("licensestate", request.payload.licenseState)
+                    .first();
+                if (existingVehicle) {
+                    return {
+                        ok: false,
+                        msge: `Vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState} already exists!`
+                    }
+                }
+
+                const newVehicle = await Vehicle.query().insert({
+                    make: request.payload.make,
+                    model: request.payload.model,
+                    color: request.payload.color,
+                    capacity: request.payload.capacity,
+                    mpg: request.payload.mpg,
+                    licensestate: request.payload.licenseState,
+                    licensenumber: request.payload.licenseNumber
+                });
+
+                if (newVehicle) {
+                    return {
+                        ok: true,
+                        msge: `Added vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
+                    }
+                } else {
+                    return {
+                        ok: false,
+                        msge: `Error: could not add vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
+                    }
+                }
+            }
+        },
+        {
+            method: "PUT",
+            path: "/vehicles",
+            options: {
+                description: "Update a vehicle"
+            },
+            handler: async (request) => {
+                const plateExists = await Vehicle.query()
+                    .where("licensenumber", request.payload.licenseNumber)
+                    .first();
+
+                if (plateExists) {
+                    return {
+                        ok: false,
+                        msge: `Vehicle with plate number ${request.payload.licenseNumber} already exists!`
+                    }
+                }
+
+                const updateVehicle = await Vehicle.query()
+                    .where("id", request.payload.id)
+                    .update({
+                        make: request.payload.make,
+                        model: request.payload.model,
+                        color: request.payload.color,
+                        capacity: request.payload.capacity,
+                        mpg: request.payload.mpg,
+                        licensestate: request.payload.licenseState,
+                        licensenumber: request.payload.licenseNumber
+                    });
+
+                if (updateVehicle) {
+                    return {
+                        ok: true,
+                        msge: `Updated vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
+                    }
+                } else {
+                    return {
+                        ok: false,
+                        msge: `Error: could not update vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
+                    }
+                }
+
             }
         }
     ]);
