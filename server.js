@@ -13,7 +13,7 @@ const knex = require("knex")({
 });
 
 // Objection
-const objection = require('objection');
+const objection = require("objection");
 objection.Model.knex(knex);
 
 // Models

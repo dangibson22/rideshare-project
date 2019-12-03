@@ -22,7 +22,7 @@
                     required
                 ></v-text-field>
                 <v-text-field
-                    v-model:="newDriver.licenseNumber"
+                    v-model="newDriver.licenseNumber"
                     :rules="rules.licenseNumber"
                     label="License plate number"
                     required
@@ -100,7 +100,7 @@ export default {
                     firstName: this.newDriver.firstName,
                     lastName: this.newDriver.lastName,
                     phone: this.newDriver.phone,
-                    licenseNumber: this.newDriver.licenseNumber
+                    licenseNumber: this.newDriver.licenseNumber,
                 })
                 .then(result => {
                     if (result.status === 200) {
