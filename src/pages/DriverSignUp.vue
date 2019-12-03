@@ -24,7 +24,7 @@
                 <v-text-field
                     v-model="newDriver.licenseNumber"
                     :rules="rules.licenseNumber"
-                    label="License plate number"
+                    label="Driver's license number"
                     required
                 ></v-text-field>
                 <v-btn :disabled="!valid" v-on:click="handleSubmit">
@@ -52,8 +52,6 @@
                     </v-card>
                 </v-dialog>
             </div>
-
-            <p class="body-1">arbitrary placeholder</p>
         </div>
     </v-container>
 </template>
@@ -83,10 +81,11 @@ export default {
 
             rules: {
                 required: [val => val.length > 0 || "Required"],
-                phone: [val => /\d{3}-\d{3}-\d{4}/.test(val) || "Invalid number - ex. 123-456-7890"],
+                phone: [val => /^\d{3}-\d{3}-\d{4}$/.test(val) || "Invalid number - ex. 123-456-7890"],
                 licenseNumber: [
                     // idk how license plates work
-                    val => /^([A-Za-z]{3}\d{3})|([A-Za-z]{2}\d{4})$/.test(val) || "Invalid license plate - must be AA9999 or AAA999"
+                    // haha it's drivers license number not license plate heck
+                    val => /^\d{10}$/.test(val) || "Invalid driver's license number - IN license is 10 numerical digits"
                 ]
             }
         }
@@ -96,7 +95,7 @@ export default {
             this.driverCreated = false;
 
             this.$axios
-                .post("/driver/sign-up", {
+                .post("/driver", {
                     firstName: this.newDriver.firstName,
                     lastName: this.newDriver.lastName,
                     phone: this.newDriver.phone,

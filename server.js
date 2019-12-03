@@ -25,11 +25,11 @@ const Driver = require("./Models/Driver");
 //const Passengers = require("./Models/Passengers");
 //const Ride = require("./Models/Ride");
 //const State = require("./Models/State");
-//const Vehicle = require("./Models/Vehicle");
+const Vehicle = require("./Models/Vehicle");
 //const VehicleType = require("./Models/VehicleType");
 
 // Hapi
-//const Joi = require("@hapi/joi"); // Input validation
+const Joi = require("@hapi/joi"); // Input validation
 const Hapi = require("@hapi/hapi"); // Server
 
 const server = Hapi.server({
@@ -73,34 +73,28 @@ async function init() {
 		},
         {
             method: "POST",
-            path: "/driver/sign-up",
+            path: "/driver",
             config: {
-                description: "Sign up for an account",
+                description: "Add a driver",
                 validate: {
-                    /*
                     payload: Joi.object({
                         firstName: Joi.string().required(),
                         lastName: Joi.string().required(),
                         phone: Joi.string().required(),
                         licenseNumber: Joi.string().required()
                     })
-
-                     */
                 }
             },
             // eslint-disable-next-line no-unused-vars
             handler: async (request, h) => {
                 console.log("Got here!");
                 const existingDriver = await Driver.query()
-                    .where("firstname", request.payload.firstName)
-                    .where("lastname", request.payload.lastName)
-                    .where("phone", request.payload.phone)
                     .where("licensenumber", request.payload.licenseNumber)
                     .first();
                 if (existingDriver) {
                     return {
                         ok: false,
-                        msge: `You have already been registered with this vehicle!`
+                        msge: `License number ${request.payload.licenseNumber} has already been registered!`
                     };
                 }
 
@@ -122,6 +116,26 @@ async function init() {
                         msge: `big oof`
                     }
                 }
+            }
+        },
+        {
+            method: "GET",
+            path: "/driver",
+            config: {
+                description: "View all drivers"
+            },
+            handler: () => {
+                return Driver.query();
+            }
+        },
+        {
+            method: "GET",
+            path: "/vehicles",
+            config: {
+                description: "View all vehicles"
+            },
+            handler: () => {
+                return Vehicle.query();
             }
         }
     ]);
