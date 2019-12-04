@@ -4,12 +4,13 @@
             <h4 class="display-1">Vehicle Management</h4><br>
 
             <v-btn light @click="showSignUp">Add new Vehicle</v-btn>
-            <v-btn light @click="getVehicles">Refresh Table</v-btn><br><br>
+            <v-btn light @click="getVehicles">Refresh Table</v-btn>
+            <br><br>
 
             <v-data-table
-                class="elevation-1"
-                v-bind:headers="headers"
-                v-bind:items="vehicles"
+                    class="elevation-1"
+                    v-bind:headers="headers"
+                    v-bind:items="vehicles"
             >
                 <template v-slot:item="{ item }">
                     <tr>
@@ -18,32 +19,32 @@
                         <td>{{ item.color }}</td>
                         <td>{{ item.licenseNumber }}</td>
                         <td>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon small class="ml-2" v-on="on" @click="showEdit(item)">
-                                        mdi-pencil
-                                    </v-icon>
-                                </template>
-                                <span>Edit vehicle</span>
-                            </v-tooltip>
-
-                            <v-menu offset-y>
-                                <template #activator="{ on: onMenu }">
-                                    <v-tooltip bottom>
-                                        <template #activator="{ on: onTooltip }">
-                                            <v-btn
-                                                small
-                                                class="ml-2"
-                                                v-on="{ ...onMenu, onTooltip }"
-                                                @click="showDrivers()"
-                                            ><span>text</span>
-                                                mdi-plus
-                                            </v-btn>
-                                        </template>
-                                        <span>Add authorized driver</span>
-                                    </v-tooltip>
-                                </template>
-                            </v-menu>
+                            <div class="text-center">
+                                <v-menu>
+                                    <template #activator="{ on: menu }">
+                                        <v-tooltip bottom>
+                                            <template #activator="{on: tooltip }">
+                                                <v-btn
+                                                        color="primary"
+                                                        small
+                                                        dark
+                                                        v-on="{ ...tooltip, ...menu }">
+                                                    <v-icon>mdi-plus</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <span>Add Driver</span>
+                                        </v-tooltip>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item>
+                                            Driver One
+                                        </v-list-item>
+                                        <v-list-item>
+                                            Driver Two
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                            </div>
 
                             <!--
                             <v-menu offset-y>
@@ -136,39 +137,39 @@
                         <v-card-text>
                             <v-form v-model="valid">
                                 <v-text-field
-                                    v-model="newVehicle.make"
-                                    v-bind:rules="newRules.required"
-                                    label="Make of vehicle"
+                                        v-model="newVehicle.make"
+                                        v-bind:rules="newRules.required"
+                                        label="Make of vehicle"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.model"
-                                    v-bind:rules="newRules.required"
-                                    label="Model of vehicle"
+                                        v-model="newVehicle.model"
+                                        v-bind:rules="newRules.required"
+                                        label="Model of vehicle"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.color"
-                                    v-bind:rules="newRules.required"
-                                    label="Color"
+                                        v-model="newVehicle.color"
+                                        v-bind:rules="newRules.required"
+                                        label="Color"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.capacity"
-                                    v-bind:rules="newRules.capacity"
-                                    label="Capacity"
+                                        v-model="newVehicle.capacity"
+                                        v-bind:rules="newRules.capacity"
+                                        label="Capacity"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.mpg"
-                                    v-bind:rules="newRules.mpg"
-                                    label="MPG of vehicle"
+                                        v-model="newVehicle.mpg"
+                                        v-bind:rules="newRules.mpg"
+                                        label="MPG of vehicle"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.licenseState"
-                                    v-bind:rules="newRules.state"
-                                    label="License plate state"
+                                        v-model="newVehicle.licenseState"
+                                        v-bind:rules="newRules.state"
+                                        label="License plate state"
                                 ></v-text-field>
                                 <v-text-field
-                                    v-model="newVehicle.licenseNumber"
-                                    v-bind:rules="newRules.licenseNumber"
-                                    label="License plate number"
+                                        v-model="newVehicle.licenseNumber"
+                                        v-bind:rules="newRules.licenseNumber"
+                                        label="License plate number"
                                 ></v-text-field>
                                 <v-btn right color="primary" :disabled="!valid" v-on:click="handleSubmitNewVehicle">
                                     Add Vehicle
@@ -222,211 +223,211 @@
 </template>
 
 <script>
-export default {
-    name: "vehicles-admin",
+    export default {
+        name: "vehicles-admin",
 
-    data: function() {
-        return {
+        data: function () {
+            return {
 
-            dialogHeader: "<no dialogHeader>",
-            dialogText: "<no dialogText>",
-            dialogVisible: false,
+                dialogHeader: "<no dialogHeader>",
+                dialogText: "<no dialogText>",
+                dialogVisible: false,
 
-            vehicleAdded: false,
-            addVehicleVisible: false,
-            valid: false,
+                vehicleAdded: false,
+                addVehicleVisible: false,
+                valid: false,
 
-            vehicleEdited: false,
-            editVehicleVisible: false,
-            editValid: false,
-            editingVehicle: {
-                make: "",
-                model: "",
-                color: "",
-                capacity: 0,
-                mpg: 0.0,
-                licenseState: "",
-                licenseNumber: ""
-            },
+                vehicleEdited: false,
+                editVehicleVisible: false,
+                editValid: false,
+                editingVehicle: {
+                    make: "",
+                    model: "",
+                    color: "",
+                    capacity: 0,
+                    mpg: 0.0,
+                    licenseState: "",
+                    licenseNumber: ""
+                },
 
-            defaultVehicle: {
-                make: "",
-                model: "",
-                color: "",
-                capacity: 0,
-                mpg: 0.0,
-                licenseState: "",
-                licenseNumber: ""
-            },
+                defaultVehicle: {
+                    make: "",
+                    model: "",
+                    color: "",
+                    capacity: 0,
+                    mpg: 0.0,
+                    licenseState: "",
+                    licenseNumber: ""
+                },
 
-            newVehicle: {
-                make: "",
-                model: "",
-                color: "",
-                capacity: 0,
-                mpg: 0.0,
-                licenseState: "",
-                licenseNumber: ""
-            },
+                newVehicle: {
+                    make: "",
+                    model: "",
+                    color: "",
+                    capacity: 0,
+                    mpg: 0.0,
+                    licenseState: "",
+                    licenseNumber: ""
+                },
 
-            newRules: {
-                required: [val => val.length > 0 || "Required"],
-                capacity: [val => /^\d+$/.test(val) || "Must be number"],
-                mpg: [val => /^\d+$/.test(val) || "Must be number"],
-                state: [val => /^[A-Z]{2}$/.test(val) || "2-letter state format (ex: IN)"],
-                licenseNumber: [val => /^\w{6}$/.test(val) || "Invalid format (6 alphanumeric digits)"]
-            },
+                newRules: {
+                    required: [val => val.length > 0 || "Required"],
+                    capacity: [val => /^\d+$/.test(val) || "Must be number"],
+                    mpg: [val => /^\d+$/.test(val) || "Must be number"],
+                    state: [val => /^[A-Z]{2}$/.test(val) || "2-letter state format (ex: IN)"],
+                    licenseNumber: [val => /^\w{6}$/.test(val) || "Invalid format (6 alphanumeric digits)"]
+                },
 
-            headers: [
-                { text: "Make", value: "make" },
-                { text: "Model", value: "model" },
-                { text: "Color", value: "color" },
-                { text: "License Plate", value: "licensenumber"},
-                { text: "Action", value: "action" }
-            ],
+                headers: [
+                    {text: "Make", value: "make"},
+                    {text: "Model", value: "model"},
+                    {text: "Color", value: "color"},
+                    {text: "License Plate", value: "licensenumber"},
+                    {text: "Action", value: "action"}
+                ],
 
-            vehicles: [],
+                vehicles: [],
 
-            drivers: [],
+                drivers: [],
 
 
-            edit: {}
-        }
-    },
-
-    mounted: function() {
-        this.getVehicles();
-        this.getDrivers();
-    },
-
-    methods: {
-        handleSubmitNewVehicle: function() {
-            this.vehicleAdded = false;
-
-            this.$axios
-                .post("/vehicles", {
-                    make: this.newVehicle.make,
-                    model: this.newVehicle.model,
-                    color: this.newVehicle.color,
-                    capacity: Number(this.newVehicle.capacity),
-                    mpg: Number(this.newVehicle.mpg),
-                    licenseState: this.newVehicle.licenseState,
-                    licenseNumber: this.newVehicle.licenseNumber
-                })
-                .then(result => {
-                    if (result.status === 200) {
-                        if (result.data.ok) {
-                            this.showDialog("Success", result.data.msge);
-                            this.vehicleAdded = true;
-                        } else {
-                            this.showDialog("Sorry", result.data.msge);
-                        }
-                    }
-                })
-                .catch(err => this.showDialog("Failed", err));
-        },
-
-        handleUpdateVehicle: function() {
-            this.vehicleEdited = false;
-
-            this.$axios
-                .put(`/vehicles/${this.editingVehicle.id}`, {
-                    make: this.editingVehicle.make,
-                    model: this.editingVehicle.model,
-                    color: this.editingVehicle.color,
-                    capacity: Number(this.editingVehicle.capacity),
-                    mpg: Number(this.editingVehicle.mpg),
-                    licenseState: this.editingVehicle.licenseState,
-                    licenseNumber: this.editingVehicle.licenseNumber
-                })
-                .then(result => {
-                    if (result.status === 200) {
-                        if (result.data.ok) {
-                            this.showDialog("Success", result.data.msge);
-                            this.vehicleEdited = true;
-                        } else {
-                            this.showDialog("Sorry", result.data.msge);
-                        }
-                    }
-                })
-                .catch(err => this.showDialog("Failed", err));
-        },
-
-        getVehicles: function() {
-            this.$axios.get("/vehicles").then(response => {
-                this.vehicles = response.data.map(vehicle => ({
-                    id: vehicle.id,
-                    make: vehicle.make,
-                    model: vehicle.model,
-                    color: vehicle.color,
-                    capacity: vehicle.capacity,
-                    mpg: vehicle.mpg,
-                    licenseState: vehicle.licensestate,
-                    licenseNumber: vehicle.licensenumber
-                }));
-            });
-            for (let i = 0; i < this.vehicles.length; i++) {
-                let num = this.vehicles[i].licenseNumber;
-                console.log(num);
-                this.edit.num = false;
+                edit: {}
             }
         },
 
-        getDrivers: function() {
-            this.$axios.get("/driver").then(response => {
-                this.drivers = response.data.map(thisDriver => ({
-                    firstName: thisDriver.firstname,
-                    lastName: thisDriver.lastname,
-                    phone: thisDriver.phone,
-                    licenseNumber: thisDriver.licensenumber
-                }));
-            })
+        mounted: function () {
+            this.getVehicles();
+            this.getDrivers();
         },
 
-        showDrivers: function() {
-            console.log(this.drivers);
-        },
+        methods: {
+            handleSubmitNewVehicle: function () {
+                this.vehicleAdded = false;
 
-        getDriverString(thisDriver) {
-            return `${thisDriver.firstName} ${thisDriver.lastName} phone: ${thisDriver.phone} license: ${thisDriver.licenseNumber}`;
-        },
+                this.$axios
+                    .post("/vehicles", {
+                        make: this.newVehicle.make,
+                        model: this.newVehicle.model,
+                        color: this.newVehicle.color,
+                        capacity: Number(this.newVehicle.capacity),
+                        mpg: Number(this.newVehicle.mpg),
+                        licenseState: this.newVehicle.licenseState,
+                        licenseNumber: this.newVehicle.licenseNumber
+                    })
+                    .then(result => {
+                        if (result.status === 200) {
+                            if (result.data.ok) {
+                                this.showDialog("Success", result.data.msge);
+                                this.vehicleAdded = true;
+                            } else {
+                                this.showDialog("Sorry", result.data.msge);
+                            }
+                        }
+                    })
+                    .catch(err => this.showDialog("Failed", err));
+            },
 
-        showSignUp: function() {
-            this.addVehicleVisible = true;
-        },
+            handleUpdateVehicle: function () {
+                this.vehicleEdited = false;
 
-        hideSignUp: function() {
-            this.addVehicleVisible = false;
-        },
+                this.$axios
+                    .put(`/vehicles/${this.editingVehicle.id}`, {
+                        make: this.editingVehicle.make,
+                        model: this.editingVehicle.model,
+                        color: this.editingVehicle.color,
+                        capacity: Number(this.editingVehicle.capacity),
+                        mpg: Number(this.editingVehicle.mpg),
+                        licenseState: this.editingVehicle.licenseState,
+                        licenseNumber: this.editingVehicle.licenseNumber
+                    })
+                    .then(result => {
+                        if (result.status === 200) {
+                            if (result.data.ok) {
+                                this.showDialog("Success", result.data.msge);
+                                this.vehicleEdited = true;
+                            } else {
+                                this.showDialog("Sorry", result.data.msge);
+                            }
+                        }
+                    })
+                    .catch(err => this.showDialog("Failed", err));
+            },
 
-        showEdit: function(item) {
-            this.editingVehicle = item;
-            this.editVehicleVisible = true;
-        },
+            getVehicles: function () {
+                this.$axios.get("/vehicles").then(response => {
+                    this.vehicles = response.data.map(vehicle => ({
+                        id: vehicle.id,
+                        make: vehicle.make,
+                        model: vehicle.model,
+                        color: vehicle.color,
+                        capacity: vehicle.capacity,
+                        mpg: vehicle.mpg,
+                        licenseState: vehicle.licensestate,
+                        licenseNumber: vehicle.licensenumber
+                    }));
+                });
+                for (let i = 0; i < this.vehicles.length; i++) {
+                    let num = this.vehicles[i].licenseNumber;
+                    console.log(num);
+                    this.edit.num = false;
+                }
+            },
 
-        hideEdit: function() {
-            this.editVehicleVisible = false;
-        },
+            getDrivers: function () {
+                this.$axios.get("/driver").then(response => {
+                    this.drivers = response.data.map(thisDriver => ({
+                        firstName: thisDriver.firstname,
+                        lastName: thisDriver.lastname,
+                        phone: thisDriver.phone,
+                        licenseNumber: thisDriver.licensenumber
+                    }));
+                })
+            },
 
-        showDialog: function(header, text) {
-            this.dialogHeader = header;
-            this.dialogText = text;
-            this.dialogVisible = true;
-        },
+            showDrivers: function () {
+                console.log(this.drivers);
+            },
 
-        hideDialog: function() {
-            this.dialogVisible = false;
-            if (this.vehicleAdded) {
-                this.newVehicle = this.defaultVehicle;
-                this.getVehicles();
-                this.hideSignUp();
-            }
-            if (this.vehicleEdited) {
-                this.editingVehicle = this.defaultVehicle;
-                this.getVehicles();
-                this.hideEdit();
+            getDriverString(thisDriver) {
+                return `${thisDriver.firstName} ${thisDriver.lastName} phone: ${thisDriver.phone} license: ${thisDriver.licenseNumber}`;
+            },
+
+            showSignUp: function () {
+                this.addVehicleVisible = true;
+            },
+
+            hideSignUp: function () {
+                this.addVehicleVisible = false;
+            },
+
+            showEdit: function (item) {
+                this.editingVehicle = item;
+                this.editVehicleVisible = true;
+            },
+
+            hideEdit: function () {
+                this.editVehicleVisible = false;
+            },
+
+            showDialog: function (header, text) {
+                this.dialogHeader = header;
+                this.dialogText = text;
+                this.dialogVisible = true;
+            },
+
+            hideDialog: function () {
+                this.dialogVisible = false;
+                if (this.vehicleAdded) {
+                    this.newVehicle = this.defaultVehicle;
+                    this.getVehicles();
+                    this.hideSignUp();
+                }
+                if (this.vehicleEdited) {
+                    this.editingVehicle = this.defaultVehicle;
+                    this.getVehicles();
+                    this.hideEdit();
+                }
             }
         }
     }
-}
 </script>
