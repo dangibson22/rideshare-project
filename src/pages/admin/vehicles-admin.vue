@@ -28,16 +28,17 @@
                             </v-tooltip>
 
                             <v-menu offset-y>
-                                <template v-slot:activator="{ on: menu }">
+                                <template #activator="{ on: onMenu }">
                                     <v-tooltip bottom>
-                                        <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon
+                                        <template #activator="{ on: onTooltip }">
+                                            <v-btn
                                                 small
-                                                v-on="{ on: tooltip, on: menu }"
                                                 class="ml-2"
-                                            >
+                                                v-on="{ ...onMenu, onTooltip }"
+                                                @click="showDrivers()"
+                                            ><span>text</span>
                                                 mdi-plus
-                                            </v-icon>
+                                            </v-btn>
                                         </template>
                                         <span>Add authorized driver</span>
                                     </v-tooltip>
@@ -199,6 +200,23 @@
                     </v-card>
                 </v-dialog>
             </div>
+            <v-menu>
+                <template v-slot:activator="{ onMenu }">
+                    <v-tooltip>
+                        <template v-slot:activator="{ onTooltip }">
+                            <v-btn text v-on="onMenu">
+                                <span>Button</span>
+                            </v-btn>
+                        </template>
+                        <span>Tooltip</span>
+                    </v-tooltip>
+                </template>
+                <v-list>
+                    <v-list-item>
+                        <span>buttontext</span>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </div>
     </v-container>
 </template>
