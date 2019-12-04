@@ -26,14 +26,48 @@
                                 </template>
                                 <span>Edit vehicle</span>
                             </v-tooltip>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon small class="ml-2" v-on="on">
-                                        mdi-plus
-                                    </v-icon>
+
+                            <v-menu offset-y>
+                                <template v-slot:activator="{ on: menu }">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-icon
+                                                small
+                                                v-on="{ on: tooltip, on: menu }"
+                                                class="ml-2"
+                                            >
+                                                mdi-plus
+                                            </v-icon>
+                                        </template>
+                                        <span>Add authorized driver</span>
+                                    </v-tooltip>
                                 </template>
-                                <span>Add authorized driver</span>
-                            </v-tooltip>
+                            </v-menu>
+
+                            <!--
+                            <v-menu offset-y>
+                                <template v-slot:activator="{ on: menu }">
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on: tooltip }">
+                                            <v-icon small class="ml-2"
+                                                    v-on="on"
+                                                    @click="showDrivers">
+                                                mdi-plus
+                                            </v-icon>
+                                        </template>
+                                        <span>Add authorized driver</span>
+                                    </v-tooltip>
+                                </template>
+                                <v-list>
+                                    <v-list-item
+                                            v-for="driver in drivers"
+                                            v-bind:key="driver.id"
+                                            @click="showDrivers">
+                                        <span>{{ getDriverString(driver) }}</span>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                            -->
                         </td>
                     </tr>
                 </template>
@@ -235,12 +269,16 @@ export default {
 
             vehicles: [],
 
+            drivers: [],
+
+
             edit: {}
         }
     },
 
     mounted: function() {
         this.getVehicles();
+        this.getDrivers();
     },
 
     methods: {
@@ -314,6 +352,25 @@ export default {
                 console.log(num);
                 this.edit.num = false;
             }
+        },
+
+        getDrivers: function() {
+            this.$axios.get("/driver").then(response => {
+                this.drivers = response.data.map(thisDriver => ({
+                    firstName: thisDriver.firstname,
+                    lastName: thisDriver.lastname,
+                    phone: thisDriver.phone,
+                    licenseNumber: thisDriver.licensenumber
+                }));
+            })
+        },
+
+        showDrivers: function() {
+            console.log(this.drivers);
+        },
+
+        getDriverString(thisDriver) {
+            return `${thisDriver.firstName} ${thisDriver.lastName} phone: ${thisDriver.phone} license: ${thisDriver.licenseNumber}`;
         },
 
         showSignUp: function() {
