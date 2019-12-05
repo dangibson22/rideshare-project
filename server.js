@@ -17,7 +17,7 @@ const objection = require("objection");
 objection.Model.knex(knex);
 
 // Models
-//const Authorization = require("./Models/Authorization");
+const Authorization = require("./Models/Authorization");
 const Driver = require("./Models/Driver");
 //const Drivers = require("./Models/Drivers");
 //const Location = require("./Models/Location");
@@ -90,10 +90,7 @@ async function init() {
                     .where("licensenumber", request.payload.licenseNumber)
                     .first();
                 if (existingDriver) {
-                    return {
-                        ok: false,
-                        msge: `License number ${request.payload.licenseNumber} has already been registered!`
-                    };
+                    return returnObject(false, `License number ${request.payload.licenseNumber} has already been registered!`);
                 }
 
                 const newDriver = await Driver.query().insert({
@@ -104,15 +101,9 @@ async function init() {
                 });
 
                 if (newDriver) {
-                    return {
-                        ok: true,
-                        msge: `Signed up ${request.payload.firstName} ${request.payload.lastName} with vehicle `
-                    }
+                    return returnObject(true, `Signed up ${request.payload.firstName} ${request.payload.lastName} as a driver!`);
                 } else {
-                    return {
-                        ok: false,
-                        msge: `big oof`
-                    }
+                    return returnObject(false, `Error signing up ${request.payload.firstName} ${request.payload.lastName} as a driver`);
                 }
             }
         },
@@ -124,6 +115,17 @@ async function init() {
             },
             handler: () => {
                 return Driver.query();
+            }
+        },
+        {
+            method: "PUT",
+            path: "/driver/",
+            options: {
+                description: "View all drivers in the validDriverIds array"
+            },
+            handler: (request) => {
+                let ids = request.payload.validIds;
+                return Driver.query().whereIn("id", ids);
             }
         },
         {
@@ -159,10 +161,7 @@ async function init() {
                     .where("licensestate", request.payload.licenseState)
                     .first();
                 if (existingVehicle) {
-                    return {
-                        ok: false,
-                        msge: `Vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState} already exists!`
-                    }
+                    return returnObject(true, `Vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState} already exists!`);
                 }
 
                 const newVehicle = await Vehicle.query().insert({
@@ -176,15 +175,9 @@ async function init() {
                 });
 
                 if (newVehicle) {
-                    return {
-                        ok: true,
-                        msge: `Added vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
-                    }
+                    return returnObject(true, `Added vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`);
                 } else {
-                    return {
-                        ok: false,
-                        msge: `Error: could not add vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
-                    }
+                    return returnObject(true, `Error: could not add vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`);
                 }
             }
         },
@@ -201,10 +194,7 @@ async function init() {
                     .first();
 
                 if (plateExists) {
-                    return {
-                        ok: false,
-                        msge: `Vehicle with plate number ${request.payload.licenseNumber} already exists!`
-                    }
+                    return returnObject(false, `Vehicle with plate number ${request.payload.licenseNumber} already exists!`);
                 }
 
                 const updateVehicle = await Vehicle.query()
@@ -220,23 +210,62 @@ async function init() {
                     });
 
                 if (updateVehicle) {
-                    return {
-                        ok: true,
-                        msge: `Updated vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
-                    }
+                    return returnObject(true, `Updated vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`)
                 } else {
-                    return {
-                        ok: false,
-                        msge: `Error: could not update vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`
-                    }
+                    return returnObject(false, `Error: could not update vehicle with plate number ${request.payload.licenseNumber} from ${request.payload.licenseState}`);
                 }
 
+            }
+        },
+        {
+            method: "GET",
+            path: "/authorization/{vehicleId}",
+            options: {
+                description: "Get all driverIds authorized to drive the specified vehicle"
+            },
+            handler: (request) => {
+                return Authorization.query().select("driverid").where("vehicleid", request.params.vehicleId);
+            }
+        },
+        {
+            method: "POST",
+            path: "/authorization",
+            options: {
+                description: "Authorize a driver for a vehicle"
+            },
+            handler: async (request) => {
+                const authExists = await Authorization.query()
+                    .where("driverid", request.payload.driverId)
+                    .where("vehicleid", request.payload.vehicleId)
+                    .first();
+
+                if (authExists) {
+                    return returnObject(false, `${request.payload.driverFirst} ${request.payload.driverLast} is already authorized to drive this vehicle!`);
+                }
+
+                const addAuth = await Authorization.query().insert({
+                    driverid: request.payload.driverId,
+                    vehicleid: request.payload.vehicleId
+                });
+
+                if (addAuth) {
+                    return returnObject(true, `${request.payload.driverFirst} ${request.payload.driverLast} is now authorized to drive this vehicle!`);
+                } else {
+                    return returnObject(false, `Error signing up ${request.payload.driverFirst} ${request.payload.driverLast} to drive this vehicle`)
+                }
             }
         }
     ]);
 
     // Start the server.
     await server.start();
+}
+
+function returnObject(a, b) {
+    return {
+        ok: a,
+        msge: b
+    };
 }
 
 process.on("unhandledRejection", err => {

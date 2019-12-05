@@ -3,8 +3,8 @@
         <div>
             <h4 class="display-1">Vehicle Management</h4><br>
 
-            <v-btn light @click="showSignUp">Add new Vehicle</v-btn>
-            <v-btn light @click="getVehicles">Refresh Table</v-btn><br><br>
+            <v-btn color="primary" class="ma-1" @click="showSignUp">Add new Vehicle</v-btn>
+            <v-btn color="primary" class="ma-1" @click="getVehicles">Refresh Table</v-btn><br><br>
 
             <v-data-table
                 class="elevation-1"
@@ -20,66 +20,86 @@
                         <td>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon small class="ml-2" v-on="on" @click="showEdit(item)">
-                                        mdi-pencil
-                                    </v-icon>
+                                    <v-btn
+                                        color="primary"
+                                        small
+                                        dark
+                                        class="ma-1"
+                                        v-on="on"
+                                        @click="showEdit(item)"
+                                    >
+                                        <v-icon> mdi-pencil</v-icon>
+                                    </v-btn>
                                 </template>
                                 <span>Edit vehicle</span>
                             </v-tooltip>
+
 
                             <v-menu>
                                 <template #activator="{ on: menu }">
                                     <v-tooltip bottom>
                                         <template #activator="{ on: tooltip }">
-                                            <v-icon
-                                                small
-                                                class="ml-2"
-                                                v-on="{ ...tooltip, ...menu }"
+                                            <v-btn
+                                                    color="primary"
+                                                    small
+                                                    dark
+                                                    class="ma-1"
+                                                    v-on="{ ...tooltip, ...menu }"
                                             >
-                                                mdi-plus
-                                            </v-icon>
+                                                <v-icon>mdi-plus</v-icon>
+                                            </v-btn>
                                         </template>
                                         <span>Add authorized driver</span>
                                     </v-tooltip>
                                 </template>
                                 <v-list>
-                                    <v-list-item>
-                                        Driver One
-                                    </v-list-item>
-                                    <v-list-item>
-                                        Driver Two
+                                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="addAuthorization(driver, item)">
+                                        {{ getDriverString(driver) }}
                                     </v-list-item>
                                 </v-list>
                             </v-menu>
 
-                            <!--
-                            <v-menu offset-y>
-                                <template v-slot:activator="{ on: menu }">
-                                    <v-tooltip bottom>
-                                        <template v-slot:activator="{ on: tooltip }">
-                                            <v-icon small class="ml-2"
-                                                    v-on="on"
-                                                    @click="showDrivers">
-                                                mdi-plus
-                                            </v-icon>
-                                        </template>
-                                        <span>Add authorized driver</span>
-                                    </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        color="primary"
+                                        small
+                                        dark
+                                        class="ma-1"
+                                        v-on="on"
+                                        @click="getValidDrivers(item); showAuth(item)"
+                                    >
+                                        <v-icon>mdi-view-headline</v-icon>
+                                    </v-btn>
                                 </template>
-                                <v-list>
-                                    <v-list-item
-                                            v-for="driver in drivers"
-                                            v-bind:key="driver.id"
-                                            @click="showDrivers">
-                                        <span>{{ getDriverString(driver) }}</span>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                            -->
+                            <span>View authorized drivers</span>
+                            </v-tooltip>
                         </td>
                     </tr>
                 </template>
             </v-data-table>
+
+            <div class="text-xs-center">
+                <v-dialog v-model="manageAuthorizationsVisible" width="500">
+                    <v-card>
+                        <v-card-title primary-title>
+                            Authorizations
+                        </v-card-title>
+                        <v-card v-for="driver in validDrivers" v-bind:key="driver.id">
+                            <v-card-text>{{ getDriverString(driver) }}
+                            </v-card-text>
+                        </v-card>
+                        <v-card v-if="validDrivers.length==0">
+                            <v-card-text>No drivers authorized for this vehicle!</v-card-text>
+                        </v-card>
+                        <v-card-actions>
+                            <v-btn light color="primary" right @click="hideDialog()">
+                                Close
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </div>
 
             <div class="text-xs-center">
                 <v-dialog v-model="editVehicleVisible">
@@ -124,10 +144,10 @@
                                         v-bind:rules="newRules.licenseNumber"
                                         label="License plate number"
                                 ></v-text-field>
-                                <v-btn right color="primary" :disabled="!valid" v-on:click="handleUpdateVehicle">
+                                <v-btn right color="primary" class="ma-1" :disabled="!valid" v-on:click="handleUpdateVehicle">
                                     Update Vehicle
                                 </v-btn>
-                                <v-btn right text color="primary" @click="hideEdit">Cancel</v-btn>
+                                <v-btn right text color="primary" class="ma-1" @click="hideEdit">Cancel</v-btn>
                             </v-form>
                         </v-card-text>
                     </v-card>
@@ -177,10 +197,10 @@
                                     v-bind:rules="newRules.licenseNumber"
                                     label="License plate number"
                                 ></v-text-field>
-                                <v-btn right color="primary" :disabled="!valid" v-on:click="handleSubmitNewVehicle">
+                                <v-btn right color="primary" class="ma-1" :disabled="!valid" v-on:click="handleSubmitNewVehicle">
                                     Add Vehicle
                                 </v-btn>
-                                <v-btn right text color="primary" @click="hideSignUp">Cancel</v-btn>
+                                <v-btn right text color="primary" class="ma-1" @click="hideSignUp">Cancel</v-btn>
                             </v-form>
                         </v-card-text>
                     </v-card>
@@ -207,23 +227,6 @@
                     </v-card>
                 </v-dialog>
             </div>
-            <v-menu>
-                <template v-slot:activator="{ onMenu }">
-                    <v-tooltip>
-                        <template v-slot:activator="{ onTooltip }">
-                            <v-btn text v-on="onMenu">
-                                <span>Button</span>
-                            </v-btn>
-                        </template>
-                        <span>Tooltip</span>
-                    </v-tooltip>
-                </template>
-                <v-list>
-                    <v-list-item>
-                        <span>buttontext</span>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
         </div>
     </v-container>
 </template>
@@ -242,6 +245,27 @@ export default {
             vehicleAdded: false,
             addVehicleVisible: false,
             valid: false,
+
+            manageAuthorizationsVisible: false,
+            authVehicle: {
+                id: 0,
+                make: "",
+                model: "",
+                color: "",
+                capacity: 0,
+                mpg: 0.0,
+                licenseState: "",
+                licenseNumber: ""
+            },
+            authDriver: {
+                id: 0,
+                firstName: "",
+                lastName: "",
+                phone: "",
+                licenseNumber: ""
+            },
+            validDriverIds: [],
+            validDrivers: [],
 
             vehicleEdited: false,
             editVehicleVisible: false,
@@ -382,6 +406,7 @@ export default {
         getDrivers: function() {
             this.$axios.get("/driver").then(response => {
                 this.drivers = response.data.map(thisDriver => ({
+                    id: thisDriver.id,
                     firstName: thisDriver.firstname,
                     lastName: thisDriver.lastname,
                     phone: thisDriver.phone,
@@ -390,12 +415,54 @@ export default {
             })
         },
 
-        showDrivers: function() {
-            console.log(this.drivers);
+
+        getValidDrivers: async function(thisVehicle) {
+            await this.$axios.get(`/authorization/${thisVehicle.id}`).then(response => {
+                for (var i = 0; i < response.data.length; i++) {
+                    this.validDriverIds.push(Number(response.data[i].driverid));
+                }
+            });
+            await this.$axios.put(`/driver/`, {
+                validIds: this.validDriverIds
+            })
+            .then(response => {
+                this.validDrivers = response.data.map(thisDriver => ({
+                    id: thisDriver.id,
+                    firstName: thisDriver.firstname,
+                    lastName: thisDriver.lastname,
+                    phone: thisDriver.phone,
+                    licenseNumber: thisDriver.licensenumber
+                }));
+            })
+        },
+
+        addAuthorization: function(thisDriver, thisVehicle) {
+            this.$axios
+                .post("/authorization", {
+                    driverId: thisDriver.id,
+                    vehicleId: thisVehicle.id,
+                    driverFirst: thisDriver.firstName,
+                    driverLast: thisDriver.lastName
+                })
+                .then(result => {
+                    if (result.status === 200) {
+                        if (result.data.ok) {
+                            this.showDialog("Success", result.data.msge);
+                        } else {
+                            this.showDialog("Sorry", result.data.msge);
+                        }
+                    }
+                })
+                .catch(err => this.showDialog("Failed", err));
         },
 
         getDriverString(thisDriver) {
-            return `${thisDriver.firstName} ${thisDriver.lastName} phone: ${thisDriver.phone} license: ${thisDriver.licenseNumber}`;
+            return `Name: ${thisDriver.firstName} ${thisDriver.lastName} | Phone: ${thisDriver.phone}`;
+        },
+
+        showAuth: function(thisVehicle) {
+            this.manageAuthorizationsVisible = true;
+            this.authVehicle = thisVehicle;
         },
 
         showSignUp: function() {
@@ -432,6 +499,11 @@ export default {
                 this.editingVehicle = this.defaultVehicle;
                 this.getVehicles();
                 this.hideEdit();
+            }
+            if (this.manageAuthorizationsVisible) {
+                this.validDriverIds = [];
+                this.validDrivers = [];
+                this.manageAuthorizationsVisible = false;
             }
         }
     }
