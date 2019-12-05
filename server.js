@@ -299,6 +299,18 @@ async function init() {
                 return Ride.query();
             }
         },
+        {//need to join to authorization table on vehicleid to then match driverid from selected driver to authorized driver
+            method: "GET",
+            path: "/ride/{driverID}",
+            options: {
+                description: "Fetch rides for which the drivers is authorized"
+            },
+            handler: (request) => {
+                return Ride.query()
+                    .join("authorization", 'ride.vehicleid', '=', 'authorization.vehicleid')
+                    .where('authorization.driverid', '=', request.params.driverID)
+            }
+        },
         {
             method: "POST",
             path: "/ride",

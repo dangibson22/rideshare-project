@@ -11,11 +11,83 @@
                     </v-btn>
                 </template>
                 <v-list>
-                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver); getRides(driver);">
+                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id">
                         <span>{{ getDriverString(driver) }}</span>
                     </v-list-item>
                 </v-list>
             </v-menu>
+            <br><br>
+            <v-data-table
+                    class="elevation-1"
+                    v-bind:headers="headers"
+                    v-bind:items="rides"
+            >
+                <template v-slot:item="{ item }">
+                    <tr>
+                        <td>{{ item.make }}</td>
+                        <td>{{ item.model }}</td>
+                        <td>{{ item.color }}</td>
+                        <td>{{ item.licenseNumber }}</td>
+                        <td>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                            color="primary"
+                                            small
+                                            dark
+                                            class="ma-1"
+                                            v-on="on"
+                                            @click="showEdit(item)"
+                                    >
+                                        <v-icon> mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Edit vehicle</span>
+                            </v-tooltip>
+
+
+                            <v-menu>
+                                <template #activator="{ on: menu }">
+                                    <v-tooltip bottom>
+                                        <template #activator="{ on: tooltip }">
+                                            <v-btn
+                                                    color="primary"
+                                                    small
+                                                    dark
+                                                    class="ma-1"
+                                                    v-on="{ ...tooltip, ...menu }"
+                                            >
+                                                <v-icon>mdi-plus</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <span>Add authorized driver</span>
+                                    </v-tooltip>
+                                </template>
+                                <v-list>
+                                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id">
+                                        {{ getDriverString(driver) }}
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                            color="primary"
+                                            small
+                                            dark
+                                            class="ma-1"
+                                            v-on="on"
+                                    >
+                                        <v-icon>mdi-view-headline</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>View authorized drivers</span>
+                            </v-tooltip>
+                        </td>
+                    </tr>
+                </template>
+            </v-data-table>
         </div>
     </v-container>
 </template>
@@ -30,11 +102,19 @@ export default {
                 firstName: "",
                 lastName: "",
                 phone: "",
-                licenseNumber: ""
+                licenseNumber: "",
+                id: ""
             },
             currentDriverString: "Choose a driver",
 
-            drivers: []
+            drivers: [],
+
+            headers: [
+                { text: "Date", value: "date"},
+                { text: "Time", value: "time"},
+                { text: "Start Location", value: "startlocation"},
+                { text: "End Location", value: "endlocation"}
+            ]
         }
     },
 
@@ -44,7 +124,8 @@ export default {
                 firstName: thisDriver.firstname,
                 lastName: thisDriver.lastname,
                 phone: thisDriver.phone,
-                licenseNumber: thisDriver.licensenumber
+                licenseNumber: thisDriver.licensenumber,
+                id: thisDriver.id,
             }));
             console.log("mapped");
         })
@@ -60,8 +141,16 @@ export default {
             return `${thisDriver.firstName} ${thisDriver.lastName} phone: ${thisDriver.phone} license: ${thisDriver.licenseNumber}`;
         },
 
-        getRides(thisDriver) {
-            return thisDriver;
+        getRides: function() {
+            this.$axios.get("/ride").then(response => {
+                this.rides = response.data.map(thisRide => ({
+                    id: thisRide.id,
+                    date: thisRide.date,
+                    time: thisRide.time,
+                    fromLocationId: thisRide.fromlocationid,
+                    toLocationId: thisRide.tolocationid
+                }));
+            })
         }
     }
 }
