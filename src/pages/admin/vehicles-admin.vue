@@ -3,8 +3,14 @@
         <div>
             <h4 class="display-1">Vehicle Management</h4><br>
 
-            <v-btn color="primary" class="ma-1" @click="showSignUp">Add new Vehicle</v-btn>
-            <v-btn color="primary" class="ma-1" @click="getVehicles">Refresh Table</v-btn><br><br>
+            <v-card class="pa-1">
+                <v-card-text>
+                    <v-btn color="primary" class="ma-1" @click="showSignUp">Add new Vehicle</v-btn>
+                    <v-btn color="primary" class="ma-1" @click="getVehicles">Refresh Table</v-btn><br><br>
+                </v-card-text>
+            </v-card>
+
+            <br>
 
             <v-data-table
                 class="elevation-1"

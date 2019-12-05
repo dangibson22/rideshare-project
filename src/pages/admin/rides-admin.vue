@@ -8,7 +8,39 @@
                 <v-btn color="primary" class="ma-1" @click="showAddLocation">Add new location</v-btn>
             </div>
 
-            <v-data-table class="ma-1">
+            <v-data-table
+                    class="elevation-1 ma-1"
+                v-bind:headers="headers"
+                v-bind:items="rides"
+            >
+                <template v-slot:item="{ item }">
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.time }}</td>
+                        <td>{{ item.fee.toFixed(2) }}</td>
+                        <td>{{ fetchLocationData(item.fromLocationId) }}</td>
+                        <td>{{ fetchLocationData(item.toLocationId) }}</td>
+                        <td>{{ fetchVehicleData(item.vehicleId) }}</td>
+                        <td>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                            color="primary"
+                                            small
+                                            dark
+                                            class="ma-1"
+                                            v-on="on"
+                                            @click="showEditRide(item)"
+                                    >
+                                        <v-icon> mdi-pencil</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>Edit vehicle</span>
+                            </v-tooltip>
+                        </td>
+
+                    </tr>
+                </template>
 
             </v-data-table>
 
@@ -54,6 +86,7 @@
                                         v-bind:rules="rideRules.required"
                                         label="Distance (miles)"
                                 ></v-text-field>
+
 
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on }">
@@ -118,6 +151,111 @@
             </div>
 
             <div class="text-xs-center">
+                <v-dialog v-model="editRideVisible">
+                    <v-card>
+                        <v-card-title primary-title>
+                            Edit ride
+                        </v-card-title>
+                        <v-card-text>
+                            <v-form v-model="validRide">
+                                <v-menu
+                                        v-model="dateMenu"
+                                        :close-on-content-click="false"
+                                        offset-y
+                                >
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                                v-model="editingRide.date"
+                                                label="Date of ride"
+                                                :rules="rideRules.required"
+                                                prepend-icon="mdi-calendar"
+                                                readonly
+                                                v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker
+                                            v-model="editingRide.date"
+                                            @input="setDate"
+                                    >
+                                    </v-date-picker>
+                                </v-menu>
+
+                                <v-text-field
+                                        v-model="editingRide.time"
+                                        v-bind:rules="rideRules.time"
+                                        label="Time (24-hr time)"
+                                ></v-text-field>
+
+                                <v-text-field
+                                        v-model="editingRide.distance"
+                                        v-bind:rules="rideRules.required"
+                                        label="Distance (miles)"
+                                ></v-text-field>
+
+
+                                <v-menu offset-y>
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                                v-model="editingRide.fromLocString"
+                                                :rules="rideRules.location"
+                                                label="Start location for ride"
+                                                readonly
+                                                v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item @click="editingRide.fromlocation = null; editingRide.fromLocString = null; editingRide.fromLocId = 0"><span>None</span></v-list-item>
+                                        <v-list-item v-for="loc in locations" v-bind:key="loc.id" @click="editingRide.fromLocation = loc; editingRide.fromLocString = getLocString(loc); editingRide.fromLocId = loc.id">
+                                            {{ getLocString(loc) }}
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+
+                                <v-menu offset-y>
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                                v-model="editingRide.toLocString"
+                                                :rules="rideRules.location"
+                                                label="End location for ride"
+                                                readonly
+                                                v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item @click="editingRide.toLocation = null; editingRide.toLocString = null; editingRide.fromLocId = 0"><span>None</span></v-list-item>
+                                        <v-list-item v-for="loc in locations" v-bind:key="loc.id" @click="editingRide.toLocation = loc; editingRide.toLocString = getLocString(loc); editingRide.toLocId = loc.id">
+                                            {{ getLocString(loc) }}
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+
+                                <v-menu offset-y>
+                                    <template v-slot:activator="{ on }">
+                                        <v-text-field
+                                                v-model="editingRide.vehicleLicense"
+                                                :rules="rideRules.editVehicle"
+                                                label="Vehicle being used for ride (license plate number)"
+                                                readonly
+                                                v-on="on"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-list>
+                                        <v-list-item @click="editingRide.vehicleLicense = ``; editingRide.vehicleId = 0; editingRide.vehicle = null; "><span>None</span></v-list-item>
+                                        <v-list-item v-for="vehicle in vehicles" v-bind:key="vehicle.id" @click="editingRide.vehicleId = vehicle.id; editingRide.vehicleLicense = vehicle.licenseNumber; editingRide.vehicle = vehicle;">
+                                            {{ vehicle.licenseNumber }}
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+
+                                <v-btn color="primary" class="ma-1" :disabled="!validRide" @click="editRide">Edit Ride</v-btn>
+                                <v-btn text color="primary" class="ma-1" @click="hideEditRide">Cancel</v-btn>
+                            </v-form>
+                        </v-card-text>
+                    </v-card>
+                </v-dialog>
+            </div>
+
+            <div class="text-xs-center">
                 <v-dialog v-model="addLocationVisible">
                     <v-card>
                         <v-card-title primary-title>
@@ -146,8 +284,8 @@
                                         label="State"
                                 ></v-text-field>
                                 <v-text-field
-                                        v-model="newLocation.zip"
-                                        v-bind:rules="locationRules.zip"
+                                        v-model="newLocation.zipcode"
+                                        v-bind:rules="locationRules.zipcode"
                                         label="Zip code"
                                 ></v-text-field>
                                 <v-btn color="primary" class="ma-1" :disabled="!validLocation" @click="addLocation">Add Location</v-btn>
@@ -200,6 +338,9 @@
                 validRide: false,
                 rideAdded: false,
 
+                editRideVisible: false,
+                vehicleEdited: false,
+
                 addLocationVisible: false,
                 validLocation: false,
                 locationAdded: false,
@@ -212,13 +353,16 @@
                     ],
                     vehicle: [
                         () => this.newRide.vehicle != null || "Ride must have a vehicle!"
+                    ],
+                    editVehicle: [
+                        () => this.editingRide.vehicle != null || "Ride must have a vehicle!"
                     ]
                 },
 
                 locationRules: {
                     required: [val => val.length > 0 || "Required"],
                     state: [ val => /^[A-Z]{2}$/.test(val) || "2-letter state format (ex: IN)"],
-                    zip: [val => /^\d{5}$/.test(val) || "5-number zip code format"]
+                    zipcode: [val => /^\d{5}$/.test(val) || "5-number zip code format"]
                 },
 
                 newRide: {
@@ -230,6 +374,22 @@
                     vehicleId: 0,
                     vehicleLicense: "",
                     vehicle: null,
+                    fromLocation: null,
+                    fromLocString: "",
+                    fromLocId: 0,
+                    toLocation: null,
+                    toLocString: "",
+                    toLocId: 0,
+                },
+
+                editingRide: {
+                    date: "",
+                    time: "",
+                    distance: 0,
+                    fuelprice: 0,
+                    fee: 0,
+                    vehicleId: 0,
+                    vehiclePlate: "",
                     fromLocation: null,
                     fromLocString: "",
                     fromLocId: 0,
@@ -259,7 +419,7 @@
                     address: "",
                     city: "",
                     state: "",
-                    zip: 0
+                    zipcode: 0
                 },
 
                 defLocation: {
@@ -267,12 +427,22 @@
                     address: "",
                     city: "",
                     state: "",
-                    zip: 0
+                    zipcode: 0
                 },
 
                 rides: [],
                 locations: [],
                 vehicles: [],
+
+                headers: [
+                    { text: "Date", value: "date" },
+                    { text: "Time", value: "time" },
+                    { text: "Price", value: "fee" },
+                    { text: "Start", value: "fromLocation" },
+                    { text: "Destination", value: "toLocation" },
+                    { text: "Vehicle License Plate", value: "vehicle" },
+                    { text: "Actions", value: "actions" }
+                ]
 
 
             }
@@ -312,7 +482,7 @@
                         address: this.newLocation.address,
                         city: this.newLocation.city,
                         state: this.newLocation.state,
-                        zipcode: this.newLocation.zip
+                        zipcode: this.newLocation.zipcode
                 })
                 .then(result => {
                     if (result.status === 200) {
@@ -356,6 +526,34 @@
                 .catch(err => this.showDialog("Failed", err));
             },
 
+            editRide: function() {
+                let fuelPrice = 2.60;
+                let mpg = this.newRide.vehicle.mpg;
+                let range = mpg*13;
+                let fee = (this.newRide.distance / range) * fuelPrice * 13;
+                this.$axios
+                    .put(`/rides/${this.editingRide.id}`), {
+                        date: this.editingRide.date,
+                        time: this.editingRide.time,
+                        distance: this.editingRide.distance,
+                        fuelPrice: fuelPrice,
+                        fee: fee,
+                        vehicleId: this.editingRide.vehicle.id,
+                        fromLocationId: this.editingRide.fromLocation.id,
+                        toLocationId: this.editingRide.toLocation.id
+                }
+            },
+
+            fetchLocationData: function(id) {
+                let i = this.locations.findIndex(x => x.id === id);
+                return this.getLocString(this.locations[i]);
+            },
+
+            fetchVehicleData: function(id) {
+                let i = this.vehicles.find(x => x.id === id);
+                return i.licenseNumber;
+            },
+
             getRides: function() {
                 this.$axios.get("/ride").then(response => {
                     this.rides = response.data.map(thisRide => ({
@@ -380,7 +578,7 @@
                         address: thisLoc.address,
                         city: thisLoc.city,
                         state: thisLoc.state,
-                        zip: thisLoc.zipcode
+                        zipcode: thisLoc.zipcode,
                     }));
                 })
             },
@@ -409,6 +607,15 @@
                 this.newRide = this.defRide;
             },
 
+            showEditRide: function(thisRide) {
+                this.editRideVisible = true;
+                this.editingRide = thisRide;
+            },
+
+            hideEditRide: function() {
+                this.editRideVisible = false;
+            },
+
             showAddLocation: function() {
                 this.addLocationVisible = true;
             },
@@ -435,7 +642,7 @@
             },
 
             getLocString: function(loc) {
-                return `${loc.address} ${loc.city} ${loc.zip}`;
+                return `${loc.address} ${loc.city} ${loc.zipcode}`;
             }
         }
     }
