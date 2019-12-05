@@ -27,22 +27,29 @@
                                 <span>Edit vehicle</span>
                             </v-tooltip>
 
-                            <v-menu offset-y>
-                                <template #activator="{ on: onMenu }">
+                            <v-menu>
+                                <template #activator="{ on: menu }">
                                     <v-tooltip bottom>
-                                        <template #activator="{ on: onTooltip }">
-                                            <v-btn
+                                        <template #activator="{ on: tooltip }">
+                                            <v-icon
                                                 small
                                                 class="ml-2"
-                                                v-on="{ ...onMenu, onTooltip }"
-                                                @click="showDrivers()"
-                                            ><span>text</span>
+                                                v-on="{ ...tooltip, ...menu }"
+                                            >
                                                 mdi-plus
-                                            </v-btn>
+                                            </v-icon>
                                         </template>
                                         <span>Add authorized driver</span>
                                     </v-tooltip>
                                 </template>
+                                <v-list>
+                                    <v-list-item>
+                                        Driver One
+                                    </v-list-item>
+                                    <v-list-item>
+                                        Driver Two
+                                    </v-list-item>
+                                </v-list>
                             </v-menu>
 
                             <!--
