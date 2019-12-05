@@ -61,16 +61,6 @@ async function init() {
 
     // Configure routes.
     server.route([
-		{
-			method: "GET",
-			path: '/{param*}',
-			handler: {
-				directory: {
-					path: '.',
-					redirectToSlash: true
-				}
-			}
-		},
         {
             method: "POST",
             path: "/driver",
