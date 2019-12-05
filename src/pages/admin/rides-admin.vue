@@ -159,7 +159,7 @@
                         <v-card-text>
                             <v-form v-model="validRide">
                                 <v-menu
-                                        v-model="dateMenu"
+                                        v-model="editDateMenu"
                                         :close-on-content-click="false"
                                         offset-y
                                 >
@@ -334,6 +334,8 @@
                 dialogVisible: false,
 
                 dateMenu: false,
+                editDateMenu: false,
+
                 addRideVisible: false,
                 validRide: false,
                 rideAdded: false,
@@ -347,9 +349,9 @@
 
 
                 rideRules: {
-                    required: [val => val.length > 0 || "Required"],
+                    required: [val => console.log(val) || val.length > 0 || "Required"],
                     time: [
-                        val => /^[0-1]\d:\d\d$/.test(val) || /^2[0-3]:\d\d/.test(val) || "24 hour time, 00:00 format"
+                        val => /^[0-1]\d:\d\d:?\d?\d?$/.test(val) || /^2[0-3]:\d\d/.test(val) || "24 hour time, 00:00 format"
                     ],
                     vehicle: [
                         () => this.newRide.vehicle != null || "Ride must have a vehicle!"
@@ -459,6 +461,7 @@
 
             setDate: function() {
                 this.dateMenu = false;
+                this.editDateMenu = false;
             },
 
             addLocation: async function() {
@@ -610,6 +613,15 @@
             showEditRide: function(thisRide) {
                 this.editRideVisible = true;
                 this.editingRide = thisRide;
+                this.editingRide.fromLocation = this.locations.find(x => x.id === thisRide.fromLocationId);
+                this.editingRide.fromLocString = this.getLocString(this.editingRide.fromLocation);
+                this.editingRide.fromLocId = this.editingRide.fromLocation.fromLocationId;
+                this.editingRide.toLocation = this.locations.find(x => x.id === thisRide.toLocationId);
+                this.editingRide.toLocString = this.getLocString(this.editingRide.toLocation);
+                this.editingRide.toLocId = this.editingRide.toLocation.toLocationId;
+                this.editingRide.vehicle = this.vehicles.find(x => x.id === thisRide.vehicleId);
+                this.editingRide.vehicleLicense = this.editingRide.vehicle.licenseNumber;
+                this.editingRide.vehicleId = this.editingRide.vehicle.id;
             },
 
             hideEditRide: function() {

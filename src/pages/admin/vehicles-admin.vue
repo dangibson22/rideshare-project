@@ -3,10 +3,11 @@
         <div>
             <h4 class="display-1">Vehicle Management</h4><br>
 
-            <v-card class="pa-1">
+            <v-card class="">
                 <v-card-text>
                     <v-btn color="primary" class="ma-1" @click="showSignUp">Add new Vehicle</v-btn>
-                    <v-btn color="primary" class="ma-1" @click="getVehicles">Refresh Table</v-btn><br><br>
+                    <v-btn color="primary" class="ma-1" @click="showAddType">Add new vehicle type</v-btn>
+                    <v-btn color="primary" class="ma-1" @click="getVehicles">Refresh Table</v-btn>
                 </v-card-text>
             </v-card>
 
@@ -214,6 +215,27 @@
             </div>
 
             <div class="text-xs-center">
+                <v-dialog v-model="addTypeVisible">
+                    <v-card>
+                        <v-card-title>Add a new vehicle type</v-card-title>
+                        <v-card-text>
+                            <v-form v-model="validType">
+                                <v-text-field
+                                    v-model="newType.type"
+                                    :rules="newRules.required"
+                                    label="Type of vehicle"
+                                ></v-text-field>
+                                <v-btn color="primary" class="ma-1" :disabled="!validType" @click="addType">
+                                    Add Vehicle Type
+                                </v-btn>
+                                <v-btn text color="primary" class="ma-1" @click="hideAddType">Cancel</v-btn>
+                            </v-form>
+                        </v-card-text>
+                    </v-card>
+                </v-dialog>
+            </div>
+
+            <div class="text-xs-center">
                 <v-dialog v-model="dialogVisible" width="500">
                     <v-card>
                         <v-card-title primary-title>
@@ -253,6 +275,18 @@ export default {
             valid: false,
 
             manageAuthorizationsVisible: false,
+
+            addTypeVisible: false,
+            validType: false,
+
+            newType: {
+                type: ""
+            },
+
+            defType: {
+                type: ""
+            },
+
             authVehicle: {
                 id: 0,
                 make: "",
@@ -464,6 +498,10 @@ export default {
 
         getDriverString(thisDriver) {
             return `Name: ${thisDriver.firstName} ${thisDriver.lastName} | Phone: ${thisDriver.phone}`;
+        },
+
+        showAddType: function() {
+            this.addTypeVisible = true;
         },
 
         showAuth: function(thisVehicle) {

@@ -26,7 +26,7 @@ const Location = require("./Models/Location");
 const Ride = require("./Models/Ride");
 const State = require("./Models/State");
 const Vehicle = require("./Models/Vehicle");
-//const VehicleType = require("./Models/VehicleType");
+const VehicleType = require("./Models/VehicleType");
 
 // Hapi
 const Joi = require("@hapi/joi"); // Input validation
@@ -357,6 +357,33 @@ async function init() {
             },
             handler: () => {
                 return Location.query();
+            }
+        },
+        {
+            method: "POST",
+            path: "/vehicletype",
+            options: {
+                description: "Add a new vehicle type"
+            },
+            handler: async (request) => {
+                const typeExists = await VehicleType.query()
+                    .where("type", request.payload.type)
+                    .first();
+
+                if (typeExists) {
+                    return returnObject(false, `Error: vehicle type already exists!`);
+                }
+
+                const typeAdded = await VehicleType.query().insert({
+                    type: request.payload.type
+                });
+
+                if (typeAdded) {
+                    return returnObject(true, `Vehicle type ${request.payload.type} successfully added!`);
+                } else {
+                    return returnObject(false, `Vehicle type ${request.payload.type} not added`);
+                }
+
             }
         }
     ]);
