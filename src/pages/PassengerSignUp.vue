@@ -1,34 +1,27 @@
 <template>
     <v-container>
         <div>
-            <v-btn v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
-            <br><br><h4 class="display-1">Driver Sign-Up</h4>
+            <v-btn v-bind:to="{ name: 'passenger' }">Back</v-btn>
+            <br><br><h4 class="display-1">Passenger Sign-Up</h4>
 
             <v-form v-model="valid">
                 <v-text-field
-                        v-model="newDriver.firstName"
+                        v-model="newPassenger.firstName"
                         v-bind:rules="rules.required"
                         label="First name"
                 ></v-text-field>
                 <v-text-field
-                        v-model="newDriver.lastName"
-                        :rules="rules.required"
+                        v-model="newPassenger.lastName"
+                        v-bind:rules="rules.required"
                         label="Last name"
                 ></v-text-field>
                 <v-text-field
-                        v-model="newDriver.phone"
-                        :rules="rules.phone"
+                        v-modle="newPassenger.phone"
+                        v-bind:rules="rules.phone"
                         label="Phone number"
-                        required
-                ></v-text-field>
-                <v-text-field
-                        v-model="newDriver.licenseNumber"
-                        :rules="rules.licenseNumber"
-                        label="License plate number"
-                        required
                 ></v-text-field>
                 <v-btn :disabled="!valid" v-on:click="handleSubmit">
-                    Become Driver
+                    Become Passenger
                 </v-btn>
             </v-form>
 
@@ -47,67 +40,59 @@
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text v-on:click="hideDialog">Okay</v-btn>
+                            <v-btn color="primary" text v-on:click="hideDialog">OKay</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
             </div>
-
-            <p class="body-1">arbitrary placeholder</p>
         </div>
     </v-container>
 </template>
 
 <script>
     export default {
-        name: "DriverSignUpPage",
+        name: "PassengerSignUp.vue",
         components: {},
         data: function() {
-            return {
+            return{
                 valid: false,
 
-                newDriver: {
+                newPassenger: {
                     firstName: "",
                     lastName: "",
-                    phone: "",
-                    licenseNumber: ""
+                    phone: ""
                 },
 
-                driverRegistered: false,
+                passengerRegistered: false,
 
                 dialogHeader: "<no dialogHeader>",
                 dialogText: "<no dialogText>",
                 dialogVisible: false,
 
-                // Validation rules
+                // Validation Rules
 
                 rules: {
                     required: [val => val.length > 0 || "Required"],
-                    phone: [val => /^\d{3}-\d{3}-\d{4}$/.test(val) || "Invalid number - ex. 123-456-7890"],
-                    licenseNumber: [
-                        // idk how license plates work
-                        val => /^([A-Za-z]{3}\d{3})|([A-Za-z]{2}\d{4})$/.test(val) || "Invalid license plate - must be AA9999 or AAA999"
-                    ]
+                    phone: [val => /^\d{3}-\d{3}-\d{4}$/.test(val) && val.length > 0 || "Invalid number - ex. 123-456-7890"]
                 }
             }
         },
         methods: {
             handleSubmit: function() {
-                this.driverCreated = false;
+                this.passengerCreated = false;
 
                 this.$axios
-                    .post("/driver/sign-up", {
-                        firstName: this.newDriver.firstName,
-                        lastName: this.newDriver.lastName,
-                        phone: this.newDriver.phone,
-                        licenseNumber: this.newDriver.licenseNumber,
+                    .post("/find-ride/passenger-sign-up", {
+                        firstName: this.newPassenger.firstName,
+                        lastName: this.newPassenger.lastName,
+                        phone: this.newPassenger.phone
                     })
                     .then(result => {
                         if (result.status === 200) {
                             if (result.data.ok) {
                                 this.showDialog("Success", result.data.msge);
-                                this.driverCreated = true;
-                            } else {
+                                this.passengerCreated = true;
+                            }else{
                                 this.showDialog("Sorry", result.data.msge);
                             }
                         }
