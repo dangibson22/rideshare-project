@@ -20,11 +20,11 @@ objection.Model.knex(knex);
 const Authorization = require("./Models/Authorization");
 const Driver = require("./Models/Driver");
 //const Drivers = require("./Models/Drivers");
-//const Location = require("./Models/Location");
+const Location = require("./Models/Location");
 //const Passenger = require("./Models/Passenger");
 //const Passengers = require("./Models/Passengers");
-//const Ride = require("./Models/Ride");
-//const State = require("./Models/State");
+const Ride = require("./Models/Ride");
+const State = require("./Models/State");
 const Vehicle = require("./Models/Vehicle");
 //const VehicleType = require("./Models/VehicleType");
 
@@ -253,6 +253,70 @@ async function init() {
                 } else {
                     return returnObject(false, `Error signing up ${request.payload.driverFirst} ${request.payload.driverLast} to drive this vehicle`)
                 }
+            }
+        },
+        {
+            method: "POST",
+            path: "/location",
+            options: {
+                description: "Add a new location"
+            },
+            handler: async (request) => {
+                const locationExists = await Location.query()
+                    .where("address", request.payload.address)
+                    .where("city", request.payload.city)
+                    .where("zipcode", request.payload.zipcode)
+                    .orWhere("name", request.payload.name)
+                    .first();
+
+                if (locationExists) {
+                    return returnObject(false, "Location already exists in database!");
+                }
+
+                const addAuth = await Location.query().insert({
+                    name: request.payload.name,
+                    address: request.payload.address,
+                    city: request.payload.city,
+                    state: request.payload.state,
+                    zipcode: request.payload.zipcode
+                });
+
+                if (addAuth) {
+                    return returnObject(true, "Location successfully added!");
+                } else {
+                    return returnObject(false, `Error adding location`)
+                }
+            }
+        },
+        {
+            method: "PUT",
+            path: "/state/{ab}",
+            options: {
+                description: "Find the given state"
+            },
+            handler: async (request) => {
+                return State.query()
+                    .where("abbreviation", request.params.ab);
+            }
+        },
+        {
+            method: "GET",
+            path: "/ride",
+            options: {
+                description: "Fetch all rides"
+            },
+            handler: () => {
+                return Ride.query();
+            }
+        },
+        {
+            method: "GET",
+            path: "/locations",
+            options: {
+                description: "Fetch all locations"
+            },
+            handler: () => {
+                return Location.query();
             }
         }
     ]);
