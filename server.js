@@ -310,6 +310,46 @@ async function init() {
             }
         },
         {
+            method: "POST",
+            path: "/ride",
+            options: {
+                description: "Create a new ride"
+            },
+            handler: async (request) => {
+                const rideExists = await Ride.query()
+                    .where("date", request.payload.date)
+                    .where("time", request.payload.time)
+                    .where("fromlocationid", request.payload.fromLocationId)
+                    .where("tolocationid", request.payload.toLocationId)
+                    .where("vehicleid", request.payload.vehicleId)
+                    .first();
+
+                if (rideExists) {
+                    return returnObject(false, `Error: Ride already exists!`);
+                }
+
+                const rideAdded = await Ride.query().insert({
+                    date: request.payload.date,
+                    time: request.payload.time,
+                    distance: request.payload.distance,
+                    fuelprice: request.payload.fuelPrice,
+                    fee: request.payload.fee,
+                    vehicleid: request.payload.vehicleId,
+                    fromlocationid: request.payload.fromLocationId,
+                    tolocationid: request.payload.toLocationId
+                });
+
+                if (rideAdded) {
+                    return returnObject(true, "Ride successfully added!");
+                } else {
+                    return returnObject(false, "Error adding ride");
+                }
+
+            }
+
+        },
+
+        {
             method: "GET",
             path: "/locations",
             options: {
