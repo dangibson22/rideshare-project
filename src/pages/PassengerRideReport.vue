@@ -19,10 +19,11 @@
                 </v-list>
             </v-menu>
             <br><br>
+            <p>Data is there but is shy, check vue debugger</p>
             <v-data-table
                     class="elevation-1 ma-1"
                     v-bind:headers="headers"
-                    v-bind:items="rides"
+                    v-bind:items="validRides"
             >
                 <template v-slot:item="{ item }">
                     <tr>
@@ -31,7 +32,7 @@
                         <td>{{ item.fee.toFixed(2) }}</td>
                         <td>{{ fetchLocationData(item.fromLocationId) }}</td>
                         <td>{{ fetchLocationData(item.toLocationId) }}</td>
-                        <td>{{ fetchVehicleData(item.vehicleId) }}</td>
+                        <!--<td>{{ fetchVehicleData(item.vehicleId) }}</td>-->
                     </tr>
                 </template>
             </v-data-table>
@@ -58,10 +59,11 @@
                 },
                 currentPassengerString: "Choose a passenger",
 
-                rides: [],
+                signedUpRides: [],
                 locations: [],
                 vehicles: [],
                 passengers: [],
+                validRides: [],
 
                 headers: [
                     { text: "Date", value: "date" },
@@ -94,7 +96,48 @@
                         this.validRideIds.push(Number(response.data[i].rideid));
                     }
                 });
-                this.getRides(thisPassenger.id);
+                await this.$axios.put(`/rides/findByRideIdArray`, {
+                    inputArray: this.validRideIds
+                })
+                .then(response => {
+                    this.validRides = response.data.map(thisRide => ({
+                        id: thisRide.id,
+                        date: thisRide.date,
+                        time: thisRide.time,
+                        distance: thisRide.distance,
+                        fuelPrice: thisRide.fuelprice,
+                        fee: thisRide.fee,
+                        vehicleId: thisRide.vehicleid,
+                        fromLocationId: thisRide.fromlocationid,
+                        toLocationId: thisRide.tolocationid
+                    }))
+                    console.log(this.validRides);
+                })
+
+                await this.$axios.get(`/find-ride/${thisPassenger.id}`).then(response => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        //this.signedUpRideIds.push(Number(response.data[i].rideid));
+                    }
+                });
+                for(var i=0; i <this.validRideIds.length;i++) {
+                    //console.log(this.validRideIds[i]);
+                }
+                await this.$axios.put("/rides/findByRideIdArray", {
+                    inputArray: this.validRideIds
+                })
+               /* .then(response => {
+                    this.signedUpRides = response.data.map(thisRide => ({
+                        id: thisRide.id,
+                        date: thisRide.date,
+                        time: thisRide.time,
+                        distance: thisRide.distance,
+                        fuelPrice: thisRide.fuelprice,
+                        fee: thisRide.fee,
+                        vehicleId: thisRide.vehicleid,
+                        fromLocationId: thisRide.fromlocationid,
+                        toLocationId: thisRide.tolocationid
+                    }))
+                })*/
             },
 
             getPassengers: function() {
