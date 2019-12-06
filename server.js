@@ -163,13 +163,24 @@ async function init() {
         },
         {
             method: "PUT",
-            path: "/rides/findByArray",
+            path: "/rides/findByVehicleId",
             options: {
                 description: "View all rides whose vehicle are in the validVehicleIds array"
             },
             handler: (request) => {
                 let ids = request.payload.inputArray;
                 return Ride.query().whereIn("vehicleid", ids);
+            }
+        },
+        {
+            method: "PUT",
+            path: "/rides/findByRideIdArray",
+            options: {
+                description: "View all rides whose id are in the validRideIds array"
+            },
+            handler: (request) => {
+                let ids = request.payload.inputArray;
+                return Ride.query().whereIn("id", ids);
             }
         },
         {

@@ -12,7 +12,7 @@
                     </v-btn>
                 </template>
                 <v-list>
-                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver); getSignedUpRides()">
+                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver)">
                         <span>{{ getDriverString(driver) }}</span>
                     </v-list-item>
                 </v-list>
@@ -142,13 +142,14 @@ export default {
             this.currentDriver = thisDriver;
             this.currentDriverString = this.getDriverString(thisDriver);
             this.validVehicleIds = [];
+            this.signedUpRideIds = [];
 
             await this.$axios.get(`/authorization/driver/${thisDriver.id}`).then(response => {
                 for (var i = 0; i < response.data.length; i++) {
                     this.validVehicleIds.push(Number(response.data[i].vehicleid));
                 }
             });
-            await this.$axios.put(`/rides/findByArray`, {
+            await this.$axios.put(`/rides/findByVehicleId`, {
                 inputArray: this.validVehicleIds
             })
             .then(response => {
@@ -170,7 +171,8 @@ export default {
                     this.signedUpRideIds.push(Number(response.data[i].rideid));
                 }
             });
-            await this.$axios.put("/rides/findByArray", {
+            console.log(this.signedUpRideIds);
+            await this.$axios.put("/rides/findByRideIdArray", {
                 inputArray: this.signedUpRideIds
             })
             .then(response => {
@@ -186,28 +188,11 @@ export default {
                     toLocationId: thisRide.tolocationid
                 }))
             })
-
         },
 
         fetchLocationData: function(id) {
             let i = this.locations.findIndex(x => x.id === id);
             return this.getLocString(this.locations[i]);
-        },
-
-        getRides: function() {
-            this.$axios.get("/ride").then(response => {
-                this.rides = response.data.map(thisRide => ({
-                    id: thisRide.id,
-                    date: thisRide.date,
-                    time: thisRide.time,
-                    distance: thisRide.distance,
-                    fuelPrice: thisRide.fuelprice,
-                    fee: thisRide.fee,
-                    vehicleId: thisRide.vehicleid,
-                    fromLocationId: thisRide.fromlocationid,
-                    toLocationId: thisRide.tolocationid
-                }));
-            })
         },
 
         getDrivers: function() {
@@ -237,7 +222,12 @@ export default {
 
         getSignedUpRides: async function() {
             console.log("updating!");
-            await this.$axios.put("/rides/findByArray", {
+            await this.$axios.get(`drivers/${this.currentDriver.id}`).then(response => {
+                for (var i = 0; i < response.data.length; i++) {
+                    this.signedUpRideIds.push(Number(response.data[i].rideid));
+                }
+            });
+            await this.$axios.put("/rides/findByRideIdArray", {
                 inputArray: this.signedUpRideIds
             })
             .then(response => {
@@ -255,9 +245,9 @@ export default {
             })
         },
 
-        signUpDriver: function(thisRide, thisDriver) {
+        signUpDriver: async function(thisRide, thisDriver) {
             console.log("data: ", thisRide, thisDriver);
-            this.$axios
+            await this.$axios
                 .post("/drivers", {
                     driverId: thisDriver.id,
                     rideId: thisRide.id
