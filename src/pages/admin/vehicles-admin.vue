@@ -109,7 +109,7 @@
             </div>
 
             <div class="text-xs-center">
-                <v-dialog v-model="editVehicleVisible">
+                <v-dialog v-model="editVehicleVisible" width="1000">
                     <v-card>
                         <v-card-title primary-title>
                             Edit vehicle data
@@ -131,6 +131,15 @@
                                         v-bind:rules="newRules.required"
                                         label="Color"
                                 ></v-text-field>
+                                <v-select
+                                        v-model="editingVehicle.type"
+                                        label="Vehicle type"
+                                        :items="vehicleTypes"
+                                        item-text="type"
+                                        item-value="id"
+                                        return-object
+                                >
+                                </v-select>
                                 <v-text-field
                                         v-model="editingVehicle.capacity"
                                         v-bind:rules="newRules.capacity"
@@ -162,7 +171,7 @@
             </div>
 
             <div class="text-xs-center">
-                <v-dialog v-model="addVehicleVisible">
+                <v-dialog v-model="addVehicleVisible" width="1000">
                     <v-card>
                         <v-card-title primary-title>
                             Add a new vehicle
@@ -184,6 +193,15 @@
                                     v-bind:rules="newRules.required"
                                     label="Color"
                                 ></v-text-field>
+                                <v-select
+                                    v-model="newVehicle.type"
+                                    label="Vehicle type"
+                                    :items="vehicleTypes"
+                                    item-text="type"
+                                    item-value="id"
+                                    return-object
+                                >
+                                </v-select>
                                 <v-text-field
                                     v-model="newVehicle.capacity"
                                     v-bind:rules="newRules.capacity"
@@ -204,7 +222,7 @@
                                     v-bind:rules="newRules.licenseNumber"
                                     label="License plate number"
                                 ></v-text-field>
-                                <v-btn right color="primary" class="ma-1" :disabled="!valid" v-on:click="handleSubmitNewVehicle">
+                                <v-btn right color="primary" class="ma-1" :disabled="!valid" @click="handleSubmitNewVehicle">
                                     Add Vehicle
                                 </v-btn>
                                 <v-btn right text color="primary" class="ma-1" @click="hideSignUp">Cancel</v-btn>
@@ -215,7 +233,7 @@
             </div>
 
             <div class="text-xs-center">
-                <v-dialog v-model="addTypeVisible">
+                <v-dialog v-model="addTypeVisible" width="1000">
                     <v-card>
                         <v-card-title>Add a new vehicle type</v-card-title>
                         <v-card-text>
@@ -278,6 +296,7 @@ export default {
 
             addTypeVisible: false,
             validType: false,
+            typeAdded: false,
 
             newType: {
                 type: ""
@@ -314,6 +333,10 @@ export default {
                 make: "",
                 model: "",
                 color: "",
+                type: {
+                    id: 0,
+                    type: ""
+                },
                 capacity: 0,
                 mpg: 0.0,
                 licenseState: "",
@@ -324,6 +347,10 @@ export default {
                 make: "",
                 model: "",
                 color: "",
+                type: {
+                    id: 0,
+                    type: ""
+                },
                 capacity: 0,
                 mpg: 0.0,
                 licenseState: "",
@@ -334,6 +361,10 @@ export default {
                 make: "",
                 model: "",
                 color: "",
+                type: {
+                    id: 0,
+                    type: ""
+                },
                 capacity: 0,
                 mpg: 0.0,
                 licenseState: "",
@@ -358,6 +389,8 @@ export default {
 
             vehicles: [],
 
+            vehicleTypes: [],
+
             drivers: [],
 
 
@@ -368,17 +401,20 @@ export default {
     mounted: function() {
         this.getVehicles();
         this.getDrivers();
+        this.getVehicleTypes();
     },
 
     methods: {
         handleSubmitNewVehicle: function() {
             this.vehicleAdded = false;
+            console.log(this.newVehicle);
 
             this.$axios
                 .post("/vehicles", {
                     make: this.newVehicle.make,
                     model: this.newVehicle.model,
                     color: this.newVehicle.color,
+                    typeId: this.newVehicle.type.id,
                     capacity: Number(this.newVehicle.capacity),
                     mpg: Number(this.newVehicle.mpg),
                     licenseState: this.newVehicle.licenseState,
@@ -430,6 +466,10 @@ export default {
                     make: vehicle.make,
                     model: vehicle.model,
                     color: vehicle.color,
+                    type: {
+                        id: vehicle.vehicletypeid,
+                        type: ""
+                    },
                     capacity: vehicle.capacity,
                     mpg: vehicle.mpg,
                     licenseState: vehicle.licensestate,
@@ -451,6 +491,15 @@ export default {
                     lastName: thisDriver.lastname,
                     phone: thisDriver.phone,
                     licenseNumber: thisDriver.licensenumber
+                }));
+            })
+        },
+
+        getVehicleTypes: function() {
+            this.$axios.get("/vehicleType").then(response => {
+                this.vehicleTypes = response.data.map(thisType => ({
+                    type: thisType.type,
+                    id: thisType.id
                 }));
             })
         },
@@ -496,12 +545,36 @@ export default {
                 .catch(err => this.showDialog("Failed", err));
         },
 
+        addType: function() {
+            this.typeAdded = false;
+            this.$axios
+                .post("/vehicleType", {
+                    type: this.newType.type
+                })
+                .then(result => {
+                    if (result.status === 200) {
+                        if (result.data.ok) {
+                            this.showDialog("Success", result.data.msge);
+                            this.typeAdded = true;
+                        } else {
+                            this.showDialog("Sorry", result.data.msge);
+                        }
+                    }
+                })
+                .catch(err => this.showDialog("Failed", err));
+        },
+
         getDriverString(thisDriver) {
             return `Name: ${thisDriver.firstName} ${thisDriver.lastName} | Phone: ${thisDriver.phone}`;
         },
 
         showAddType: function() {
             this.addTypeVisible = true;
+        },
+
+        hideAddType: function() {
+            this.addTypeVisible = false;
+            this.newType = this.defType;
         },
 
         showAuth: function(thisVehicle) {
@@ -519,6 +592,10 @@ export default {
 
         showEdit: function(item) {
             this.editingVehicle = item;
+            console.log(this.vehicleTypes.find(x => x.id === this.editingVehicle.type.id));
+            let i = this.vehicleTypes.findIndex(x => x.id === this.editingVehicle.type.id);
+            console.log(i);
+            this.editingVehicle.type.type = this.vehicleTypes[i].type;
             this.editVehicleVisible = true;
         },
 
@@ -548,6 +625,10 @@ export default {
                 this.validDriverIds = [];
                 this.validDrivers = [];
                 this.manageAuthorizationsVisible = false;
+            }
+            if (this.typeAdded) {
+                this.hideAddType();
+                this.getVehicleTypes();
             }
         }
     }

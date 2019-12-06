@@ -158,6 +158,7 @@ async function init() {
                     make: request.payload.make,
                     model: request.payload.model,
                     color: request.payload.color,
+                    vehicletypeid: request.payload.typeId,
                     capacity: request.payload.capacity,
                     mpg: request.payload.mpg,
                     licensestate: request.payload.licenseState,
@@ -215,6 +216,18 @@ async function init() {
             },
             handler: (request) => {
                 return Authorization.query().select("driverid").where("vehicleid", request.params.vehicleId);
+            }
+        },
+        {//need to join to authorization table on vehicleid to then match driverid from selected driver to authorized driver
+            method: "GET",
+            path: "/ride/{driverID}",
+            options: {
+                description: "Fetch rides for which the drivers is authorized"
+            },
+            handler: (request) => {
+                return Ride.query()
+                    .join("authorization", 'ride.vehicleid', '=', 'authorization.vehicleid')
+                    .where('authorization.driverid', '=', request.params.driverID)
             }
         },
         {
@@ -299,18 +312,6 @@ async function init() {
                 return Ride.query();
             }
         },
-        {//need to join to authorization table on vehicleid to then match driverid from selected driver to authorized driver
-            method: "GET",
-            path: "/ride/{driverID}",
-            options: {
-                description: "Fetch rides for which the drivers is authorized"
-            },
-            handler: (request) => {
-                return Ride.query()
-                    .join("authorization", 'ride.vehicleid', '=', 'authorization.vehicleid')
-                    .where('authorization.driverid', '=', request.params.driverID)
-            }
-        },
         {
             method: "POST",
             path: "/ride",
@@ -363,7 +364,7 @@ async function init() {
         },
         {
             method: "POST",
-            path: "/vehicletype",
+            path: "/vehicleType",
             options: {
                 description: "Add a new vehicle type"
             },
@@ -386,6 +387,16 @@ async function init() {
                     return returnObject(false, `Vehicle type ${request.payload.type} not added`);
                 }
 
+            }
+        },
+        {
+            method: "GET",
+            path: "/vehicleType",
+            options: {
+                description: "Get all vehicle types"
+            },
+            handler: () => {
+                return VehicleType.query();
             }
         }
     ]);
