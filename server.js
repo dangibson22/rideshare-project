@@ -21,7 +21,7 @@ const Authorization = require("./Models/Authorization");
 const Driver = require("./Models/Driver");
 //const Drivers = require("./Models/Drivers");
 const Location = require("./Models/Location");
-//const Passenger = require("./Models/Passenger");
+const Passenger = require("./Models/Passenger");
 //const Passengers = require("./Models/Passengers");
 const Ride = require("./Models/Ride");
 const State = require("./Models/State");
@@ -94,6 +94,39 @@ async function init() {
                     return returnObject(true, `Signed up ${request.payload.firstName} ${request.payload.lastName} as a driver!`);
                 } else {
                     return returnObject(false, `Error signing up ${request.payload.firstName} ${request.payload.lastName} as a driver`);
+                }
+            }
+        },
+        {
+            method: "POST",
+            path: "/find-ride/passenger-sign-up",
+            options: {
+                description: "Create new passenger",
+                validate: {
+                    payload: Joi.object({
+                        firstName: Joi.string().required(),
+                        lastName: Joi.string().required(),
+                        phone: Joi.string().required()
+                    })
+                }
+            },
+            handler: async (request) => {
+                const existingPassenger = await Passenger.query()
+                    .where("phone", request.payload.phone)
+                    .first();
+                if(existingPassenger) {
+                    return returnObject(false, `Phone number ${request.payload.phone} has already been taken!`);
+                }
+                const newPassenger = await Passenger.query().insert({
+                    firstname: request.payload.firstName,
+                    lastname: request.payload.lastName,
+                    phone: request.payload.phone,
+                    id: request.payload.id
+                });
+                if(newPassenger) {
+                    return returnObject(true, `Signed up ${request.payload.firstName} ${request.payload.lastName} as a passenger!`);
+                }else{
+                    return returnObject(false, `Error signing up ${request.payload.firstName} ${request.payload.lastName} as a passenger!`);
                 }
             }
         },

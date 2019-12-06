@@ -6,22 +6,22 @@
 
             <v-form v-model="valid">
                 <v-text-field
-                        v-model="newPassenger.firstName"
+                        v-model="passenger.firstName"
                         v-bind:rules="rules.required"
                         label="First name"
                 ></v-text-field>
                 <v-text-field
-                        v-model="newPassenger.lastName"
+                        v-model="passenger.lastName"
                         v-bind:rules="rules.required"
                         label="Last name"
                 ></v-text-field>
                 <v-text-field
-                        v-modle="newPassenger.phone"
+                        v-model="passenger.phone"
                         v-bind:rules="rules.phone"
                         label="Phone number"
                 ></v-text-field>
                 <v-btn :disabled="!valid" v-on:click="handleSubmit">
-                    Become Passenger
+                    Sign Up
                 </v-btn>
             </v-form>
 
@@ -40,7 +40,7 @@
 
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text v-on:click="hideDialog">OKay</v-btn>
+                            <v-btn color="primary" text v-on:click="hideDialog">Okay</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -57,7 +57,7 @@
             return{
                 valid: false,
 
-                newPassenger: {
+                passenger: {
                     firstName: "",
                     lastName: "",
                     phone: ""
@@ -83,9 +83,9 @@
 
                 this.$axios
                     .post("/find-ride/passenger-sign-up", {
-                        firstName: this.newPassenger.firstName,
-                        lastName: this.newPassenger.lastName,
-                        phone: this.newPassenger.phone
+                        firstName: this.passenger.firstName,
+                        lastName: this.passenger.lastName,
+                        phone: this.passenger.phone,
                     })
                     .then(result => {
                         if (result.status === 200) {
