@@ -38,7 +38,7 @@
                                         v-on="on"
                                         @click="signUpDriver(item, currentDriver)"
                                     >
-                                        <v-icon>mdi-car-side</v-icon>
+                                        <v-icon>mdi-clipboard-plus</v-icon>
                                     </v-btn>
                                 </template>
                                 <span>Sign up to drive</span>

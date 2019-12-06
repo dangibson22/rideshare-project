@@ -22,7 +22,7 @@ const Driver = require("./Models/Driver");
 const Drivers = require("./Models/Drivers");
 const Location = require("./Models/Location");
 const Passenger = require("./Models/Passenger");
-//const Passengers = require("./Models/Passengers");
+const Passengers = require("./Models/Passengers");
 const Ride = require("./Models/Ride");
 const State = require("./Models/State");
 const Vehicle = require("./Models/Vehicle");
@@ -479,6 +479,34 @@ async function init() {
                     return returnObject(false, `Something went wrong signing you up`);
                 }
 
+            }
+        },
+        {
+            method: "POST",
+            path: "/passengers",
+            options: {
+                description: "Sign a passenger up for a ride"
+            },
+            handler: async (request) => {
+                const itemExists = await Passengers.query()
+                    .where("passengerid", request.payload.passengerId)
+                    .where("rideid", request.payload.rideId)
+                    .first();
+
+                if (itemExists) {
+                    return returnObject(false, `You are already signed up for this ride!`);
+                }
+
+                const itemAdded = await Passengers.query().insert({
+                    passengerid: request.payload.passengerId,
+                    rideid: request.payload.rideId
+                });
+
+                if (itemAdded) {
+                    return returnObject(true, `You're signed up for this ride!`);
+                } else {
+                    return returnObject(false, `Something went wrong signing you up`);
+                }
             }
         }
     ]);
