@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <div>
-            <v-btn v-bind:to="{ name: 'driver' }">Back</v-btn>
+            <v-btn v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
             <br><br>
             <h2>First, we need to know who you are.</h2>
             <v-menu offset-y>
@@ -271,7 +271,7 @@ export default {
         },
 
         getLocString: function(loc) {
-            return `${loc.address} ${loc.city} ${loc.zipcode}`;
+            return `${loc.address} ${loc.city}, ${loc.state} ${loc.zipcode}`;
         },
 
         showDialog: function(header, text) {

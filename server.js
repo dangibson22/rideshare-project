@@ -190,7 +190,7 @@ async function init() {
             },
             handler: (request) => {
                 let ids = request.payload.inputArray;
-                return Ride.query().whereIn("id", ids);
+                return Ride.query().whereIn("id", ids).orderBy("date");
             }
         },
         {
