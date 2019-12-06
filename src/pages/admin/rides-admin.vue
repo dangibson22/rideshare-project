@@ -37,6 +37,36 @@
                                 </template>
                                 <span>Edit vehicle</span>
                             </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        color="primary"
+                                        small
+                                        dark
+                                        class="ma-1"
+                                        v-on="on"
+                                        @click="showDrivers(item)"
+                                    >
+                                        <v-icon>mdi-car-side</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>View drivers</span>
+                            </v-tooltip>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        color="primary"
+                                        small
+                                        dark
+                                        class="ma-1"
+                                        v-on="on"
+                                        @click="showPassengers(item)"
+                                    >
+                                        <v-icon>mdi-account-group</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>View passengers</span>
+                            </v-tooltip>
                         </td>
 
                     </tr>
@@ -297,6 +327,54 @@
             </div>
 
             <div class="text-xs-center">
+                <v-dialog v-model="viewDriversVisible" width="500">
+                    <v-card>
+                        <v-card-title primary-title>
+                            <v-icon class="mr-2">mdi-car-side</v-icon>Drivers
+                        </v-card-title>
+                        <v-card v-for="driver in validDrivers" v-bind:key="driver.id">
+                            <v-card-text>
+                                <v-icon class="mr-2">mdi-car-side</v-icon>
+                                {{ getDriverString(driver) }}
+                            </v-card-text>
+                        </v-card>
+                        <v-card v-if="validDrivers.length==0">
+                            <v-card-text>No drivers signed up for this ride!</v-card-text>
+                        </v-card>
+                        <v-card-actions>
+                            <v-btn light color="primary" right @click="hideDialog()">
+                                Close
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </div>
+
+            <div class="text-xs-center">
+                <v-dialog v-model="viewPassengersVisible" width="500">
+                    <v-card>
+                        <v-card-title primary-title>
+                            <v-icon class="mr-2">mdi-car-side</v-icon>Passengers
+                        </v-card-title>
+                        <v-card v-for="p in validPassengers" v-bind:key="p.id">
+                            <v-card-text>
+                                <v-icon class="mr-2">mdi-car-side</v-icon>
+                                {{ getDriverString(p) }}
+                            </v-card-text>
+                        </v-card>
+                        <v-card v-if="validPassengers.length==0">
+                            <v-card-text>No drivers signed up for this ride!</v-card-text>
+                        </v-card>
+                        <v-card-actions>
+                            <v-btn light color="primary" right @click="hideDialog()">
+                                Close
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </div>
+
+            <div class="text-xs-center">
                 <v-dialog v-model="dialogVisible" width="500">
                     <v-card>
                         <v-card-title primary-title>
@@ -346,6 +424,9 @@
                 addLocationVisible: false,
                 validLocation: false,
                 locationAdded: false,
+
+                viewDriversVisible: false,
+                viewPassengersVisible: false,
 
 
                 rideRules: {
@@ -436,6 +517,11 @@
                 locations: [],
                 vehicles: [],
 
+                validDriverIds: [],
+                validDrivers: [],
+                validPassIds: [],
+                validPassengers: [],
+
                 headers: [
                     { text: "Date", value: "date" },
                     { text: "Time", value: "time" },
@@ -458,7 +544,6 @@
         },
 
         methods: {
-
             setDate: function() {
                 this.dateMenu = false;
                 this.editDateMenu = false;
@@ -637,6 +722,56 @@
                 this.newLocation = this.defLocation;
             },
 
+            showDrivers: async function(thisRide) {
+                this.validDriverIds = [];
+                this.validDrivers = [];
+
+                await this.$axios.get(`drivers/rideId/${thisRide.id}`).then(response => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        this.validDriverIds.push(Number(response.data[i].driverid));
+                    }
+                });
+                console.log("yeet", this.validDriverIds);
+                await this.$axios.put("/driver/findByDriverIdArray", {
+                    inputArray: this.validDriverIds
+                })
+                .then(response => {
+                    this.validDrivers = response.data.map(thisDriver => ({
+                        id: thisDriver.id,
+                        firstName: thisDriver.firstname,
+                        lastName: thisDriver.lastname,
+                        phone: thisDriver.phone,
+                        licenseNumber: thisDriver.licensenumber
+                    }))
+                });
+                this.viewDriversVisible = true;
+            },
+
+            showPassengers: async function(thisP) {
+                this.validPassIds = [];
+                this.validPassengers = [];
+
+                await this.$axios.get(`passengers/rideId/${thisP.id}`).then(response => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        this.validPassIds.push(Number(response.data[i].passengerid));
+                    }
+                });
+                console.log("yeet", this.validPassIds);
+                await this.$axios.put("/passenger/findByDriverIdArray", {
+                    inputArray: this.validPassIds
+                })
+                    .then(response => {
+                        this.validPassengers = response.data.map(thisPass => ({
+                            id: thisPass.id,
+                            firstName: thisPass.firstname,
+                            lastName: thisPass.lastname,
+                            phone: thisPass.phone
+                        }))
+                    });
+                console.log(this.validPassengers);
+                this.viewPassengersVisible = true;
+            },
+
             showDialog: function(header, text) {
                 this.dialogHeader = header;
                 this.dialogText = text;
@@ -652,11 +787,25 @@
                     this.hideAddRide();
                     this.getRides();
                 }
+                if (this.viewDriversVisible) {
+                    this.viewDriversVisible = false;
+                    this.validDriverIds = [];
+                    this.validDrivers = [];
+                }
+                if (this.viewPassengersVisible) {
+                    this.viewPassengersVisible = false;
+                    this.validPassIds = [];
+                    this.validDrivers = [];
+                }
             },
 
             getLocString: function(loc) {
                 return `${loc.address} ${loc.city} ${loc.zipcode}`;
-            }
+            },
+
+            getDriverString(thisDriver) {
+                return `Name: ${thisDriver.firstName} ${thisDriver.lastName} | Phone: ${thisDriver.phone}`;
+            },
         }
     }
 </script>

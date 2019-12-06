@@ -553,6 +553,50 @@ async function init() {
                     return returnObject(false, `Something went wrong signing you up`);
                 }
             }
+        },
+        {
+            method: "GET",
+            path: "/drivers/rideId/{rideId}",
+            options: {
+                description: "Get all drivers for a listed ride"
+            },
+            handler: (request) => {
+                return Drivers.query()
+                    .select("driverid")
+                    .where("rideid", request.params.rideId);
+            }
+        },
+        {
+            method: "PUT",
+            path: "/driver/findByDriverIdArray",
+            options: {
+                description: "Get all drivers in a driverId array"
+            },
+            handler: (request) => {
+                return Driver.query().whereIn("id", request.payload.inputArray);
+            }
+        },
+        {
+            method: "GET",
+            path: "/passengers/rideId/{rideId}",
+            options: {
+                description: "Get all passengers for a listed ride"
+            },
+            handler: (request) => {
+                return Passengers.query()
+                    .select("passengerid")
+                    .where("rideid", request.params.rideId);
+            }
+        },
+        {
+            method: "PUT",
+            path: "/passenger/findByDriverIdArray",
+            options: {
+                description: "Get all passengers in an id array"
+            },
+            handler: (request) => {
+                return Passenger.query().whereIn("id", request.payload.inputArray);
+            }
         }
     ]);
 

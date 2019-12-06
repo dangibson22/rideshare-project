@@ -49,7 +49,7 @@
                     </tr>
                 </template>
             </v-data-table><br>
-            <h4 class="display-2">View Rides you're Scheduled to Drive For</h4>
+            <h4 class="display-2">Rides You're Scheduled to Drive For</h4><br>
             <v-data-table
                 class="elevation-1"
                 v-bind:headers="signedUpHeaders"
