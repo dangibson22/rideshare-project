@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <div>
-            <v-btn v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
+            <v-btn v-bind:to="{ name: 'driver' }">Back</v-btn>
             <br><br>
             <v-menu offset-y>
                 <template v-slot:activator="{ on }">
