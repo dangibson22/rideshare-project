@@ -7,7 +7,7 @@
 
             <v-menu offset-y>
                 <template v-slot:activator="{ on }">
-                    <v-btn text v-on="on">
+                    <v-btn color="primary" v-on="on">
                         <span>{{ currentPassengerString }}</span>
                         <v-icon dark>mdi-menu-down</v-icon>
                     </v-btn>
@@ -46,6 +46,10 @@
 
         data: function() {
             return {
+                dialogHeader: "<no dialogHeader>",
+                dialogText: "<no dialogText>",
+                dialogVisible: false,
+
                 currentPassenger: {
                     firstName: "",
                     lastName: "",
@@ -57,6 +61,7 @@
                 rides: [],
                 locations: [],
                 vehicles: [],
+                passengers: [],
 
                 headers: [
                     { text: "Date", value: "date" },
@@ -72,42 +77,47 @@
         },
 
         mounted: function() {
-            this.getRides();
+            //this.getRides(currentPassenger.id);
             this.getLocations();
-            this.getVehicles();
+            //this.getVehicles();
+            this.getPassengers();
         },
 
         methods: {
-            //getPassengers: function() {
-            //    this.$axios.get("/passengers")
-            //}
-
             updateCurrent: async function(thisPassenger) {
                 this.currentPassenger = thisPassenger;
                 this.currentPassengerString = this.getPassengerString(thisPassenger);
-                this.findValidVehicles(thisPassenger.id);
+                this.validRideIds = [];
+
+                await this.$axios.get(`/find-ride/${thisPassenger.id}`).then(response => {
+                    for (var i = 0; i < response.data.length; i++) {
+                        this.validRideIds.push(Number(response.data[i].rideid));
+                    }
+                });
+                this.getRides(thisPassenger.id);
             },
 
-            fetchLocationData: function(id) {
-                let i = this.locations.findIndex(x => x.id === id);
-                return this.getLocString(this.locations[i]);
+            getPassengers: function() {
+                this.$axios.get(`/find-ride/passenger-ride-report`).then(response => {
+                    this.passengers = response.data.map(thisPassenger => ({
+                        firstName: thisPassenger.firstname,
+                        lastName: thisPassenger.lastname,
+                        phone: thisPassenger.phone,
+                        id: thisPassenger.id,
+                    }));
+                })
             },
 
-            fetchVehicleData: function(id) {
-                let i = this.vehicles.find(x => x.id === id);
-                return i.licenseNumber;
+            getPassengerString(thisPassenger) {
+                return `${thisPassenger.firstName} ${thisPassenger.lastName} phone: ${thisPassenger.phone}`;
             },
 
-            getRides: function() {
-                this.$axios.get("/ride").then(response => {
+            getRides: function(id) {
+                this.$axios.get(`/find-ride/${id}`).then(response => {
                     this.rides = response.data.map(thisRide => ({
                         id: thisRide.id,
                         date: thisRide.date,
                         time: thisRide.time,
-                        distance: thisRide.distance,
-                        fuelPrice: thisRide.fuelprice,
-                        fee: thisRide.fee,
-                        vehicleId: thisRide.vehicleid,
                         fromLocationId: thisRide.fromlocationid,
                         toLocationId: thisRide.tolocationid
                     }));
@@ -126,26 +136,6 @@
                     }));
                 })
             },
-
-            getVehicles: function() {
-                this.$axios.get("/vehicles").then(response => {
-                    this.vehicles = response.data.map(vehicle => ({
-                        id: vehicle.id,
-                        make: vehicle.make,
-                        model: vehicle.model,
-                        color: vehicle.color,
-                        capacity: vehicle.capacity,
-                        mpg: vehicle.mpg,
-                        licenseState: vehicle.licensestate,
-                        licenseNumber: vehicle.licensenumber
-                    }));
-                });
-            },
-
-
-            getLocString: function(loc) {
-                return `${loc.address} ${loc.city} ${loc.zipcode}`;
-            }
         }
     }
 </script>

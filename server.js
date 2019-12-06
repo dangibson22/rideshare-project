@@ -142,6 +142,16 @@ async function init() {
         },
         {
             method: "GET",
+            path: "/find-ride/passenger-ride-report",
+            options: {
+                description: "View all passengers"
+            },
+            handler: () => {
+                return Passenger.query();
+            }
+        },
+        {
+            method: "GET",
             path: "/driver",
             options: {
                 description: "View all drivers"
@@ -292,6 +302,18 @@ async function init() {
             },
             handler: async (request) => {
                 return Authorization.query().select("vehicleid").where("driverid", request.params.driverId);
+            }
+        },
+        {
+            method: "GET",
+            path: '/find-ride/{id}',
+            options: {
+                description: "Get all rides the passenger is signed up for"
+            },
+            handler: async (request) => {
+                return Passengers.query()
+                    .select("rideid")
+                    .where("passengerid", request.params.id);
             }
         },
         {
