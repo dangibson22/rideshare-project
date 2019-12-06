@@ -98,6 +98,16 @@ async function init() {
             }
         },
         {
+            method: "GET",
+            path: "/passenger",
+            options: {
+                description: "Get all passengers"
+            },
+            handler: () => {
+                return Passenger.query();
+            }
+        },
+        {
             method: "POST",
             path: "/find-ride/passenger-sign-up",
             options: {
