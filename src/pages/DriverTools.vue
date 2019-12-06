@@ -3,6 +3,7 @@
         <div>
             <v-btn v-bind:to="{ name: 'driver' }">Back</v-btn>
             <br><br>
+            <h2>First, we need to know who you are.</h2>
             <v-menu offset-y>
                 <template v-slot:activator="{ on }">
                     <v-btn color="primary" v-on="on">
@@ -11,12 +12,13 @@
                     </v-btn>
                 </template>
                 <v-list>
-                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver)">
+                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver); getSignedUpRides()">
                         <span>{{ getDriverString(driver) }}</span>
                     </v-list-item>
                 </v-list>
             </v-menu>
-            <br><br>
+            <br><br><br>
+            <h4 class="display-2">Sign Up to Drive</h4><br>
             <v-data-table
                     class="elevation-1"
                     v-bind:headers="headers"
@@ -44,6 +46,21 @@
                                 <span>Sign up to drive</span>
                             </v-tooltip>
                         </td>
+                    </tr>
+                </template>
+            </v-data-table><br>
+            <h4 class="display-2">View Rides you're Scheduled to Drive For</h4>
+            <v-data-table
+                class="elevation-1"
+                v-bind:headers="signedUpHeaders"
+                v-bind:items="signedUpRides"
+            >
+                <template v-slot:item="{ item }">
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.time }}</td>
+                        <td>{{ fetchLocationData(item.fromLocationId) }}</td>
+                        <td>{{ fetchLocationData(item.toLocationId) }}</td>
                     </tr>
                 </template>
             </v-data-table>
@@ -94,6 +111,8 @@ export default {
             drivers: [],
             validVehicleIds: [],
             validRides: [],
+            signedUpRideIds: [],
+            signedUpRides: [],
             locations: [],
 
 
@@ -103,6 +122,12 @@ export default {
                 { text: "Start Location", value: "startlocation"},
                 { text: "End Location", value: "endlocation"},
                 { text: "Action", value: "action" }
+            ],
+            signedUpHeaders: [
+                { text: "Date", value: "date"},
+                { text: "Time", value: "time"},
+                { text: "Start Location", value: "startlocation"},
+                { text: "End Location", value: "endlocation"},
             ]
         }
     },
@@ -123,8 +148,8 @@ export default {
                     this.validVehicleIds.push(Number(response.data[i].vehicleid));
                 }
             });
-            await this.$axios.put(`/rides/findByVehicle`, {
-                validVehicleIds: this.validVehicleIds
+            await this.$axios.put(`/rides/findByArray`, {
+                inputArray: this.validVehicleIds
             })
             .then(response => {
                 this.validRides = response.data.map(thisRide => ({
@@ -139,6 +164,29 @@ export default {
                     toLocationId: thisRide.tolocationid
                 }))
             })
+
+            await this.$axios.get(`drivers/${thisDriver.id}`).then(response => {
+                for (var i = 0; i < response.data.length; i++) {
+                    this.signedUpRideIds.push(Number(response.data[i].rideid));
+                }
+            });
+            await this.$axios.put("/rides/findByArray", {
+                inputArray: this.signedUpRideIds
+            })
+            .then(response => {
+                this.signedUpRides = response.data.map(thisRide => ({
+                    id: thisRide.id,
+                    date: thisRide.date,
+                    time: thisRide.time,
+                    distance: thisRide.distance,
+                    fuelPrice: thisRide.fuelprice,
+                    fee: thisRide.fee,
+                    vehicleId: thisRide.vehicleid,
+                    fromLocationId: thisRide.fromlocationid,
+                    toLocationId: thisRide.tolocationid
+                }))
+            })
+
         },
 
         fetchLocationData: function(id) {
@@ -152,15 +200,13 @@ export default {
                     id: thisRide.id,
                     date: thisRide.date,
                     time: thisRide.time,
+                    distance: thisRide.distance,
+                    fuelPrice: thisRide.fuelprice,
+                    fee: thisRide.fee,
+                    vehicleId: thisRide.vehicleid,
                     fromLocationId: thisRide.fromlocationid,
                     toLocationId: thisRide.tolocationid
                 }));
-            })
-        },
-
-        test: function() {
-            this.$axios.get("/drivers").then(response => {
-                console.log(response);
             })
         },
 
@@ -189,6 +235,26 @@ export default {
             })
         },
 
+        getSignedUpRides: async function() {
+            console.log("updating!");
+            await this.$axios.put("/rides/findByArray", {
+                inputArray: this.signedUpRideIds
+            })
+            .then(response => {
+                this.signedUpRides = response.data.map(thisRide => ({
+                    id: thisRide.id,
+                    date: thisRide.date,
+                    time: thisRide.time,
+                    distance: thisRide.distance,
+                    fuelPrice: thisRide.fuelprice,
+                    fee: thisRide.fee,
+                    vehicleId: thisRide.vehicleid,
+                    fromLocationId: thisRide.fromlocationid,
+                    toLocationId: thisRide.tolocationid
+                }))
+            })
+        },
+
         signUpDriver: function(thisRide, thisDriver) {
             console.log("data: ", thisRide, thisDriver);
             this.$axios
@@ -207,6 +273,7 @@ export default {
                     }
                 })
                 .catch(err => { this.showDialog("Failed", err); console.log(err); } );
+            this.getSignedUpRides();
         },
 
         getDriverString(thisDriver) {

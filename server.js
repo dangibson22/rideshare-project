@@ -163,12 +163,12 @@ async function init() {
         },
         {
             method: "PUT",
-            path: "/rides/findByVehicle",
+            path: "/rides/findByArray",
             options: {
                 description: "View all rides whose vehicle are in the validVehicleIds array"
             },
             handler: (request) => {
-                let ids = request.payload.validVehicleIds;
+                let ids = request.payload.inputArray;
                 return Ride.query().whereIn("vehicleid", ids);
             }
         },
@@ -363,6 +363,18 @@ async function init() {
             },
             handler: () => {
                 return Ride.query();
+            }
+        },
+        {
+            method: "GET",
+            path: "/drivers/{driverId}",
+            options: {
+                description: "Fetch all rides driver is signed up for"
+            },
+            handler: (request) => {
+                return Drivers.query()
+                    .select("rideid")
+                    .where("driverid", request.params.driverId);
             }
         },
         {
