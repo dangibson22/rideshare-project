@@ -19,7 +19,7 @@ objection.Model.knex(knex);
 // Models
 const Authorization = require("./Models/Authorization");
 const Driver = require("./Models/Driver");
-//const Drivers = require("./Models/Drivers");
+const Drivers = require("./Models/Drivers");
 const Location = require("./Models/Location");
 //const Passenger = require("./Models/Passenger");
 //const Passengers = require("./Models/Passengers");
@@ -407,6 +407,35 @@ async function init() {
             },
             handler: () => {
                 return VehicleType.query();
+            }
+        },
+        {
+            method: "POST",
+            path: "/drivers",
+            options: {
+                description: "Sign up a driver for a ride"
+            },
+            handler: async (request) => {
+                const itemExists = await Drivers.query()
+                    .where("driverid", request.payload.driverId)
+                    .where("rideid", request.payload.rideId)
+                    .first();
+
+                if (itemExists) {
+                    return returnObject(false, `You are already signed up for this ride!`);
+                }
+
+                const itemAdded = await Drivers.query().insert({
+                    driverid: request.payload.driverId,
+                    rideid: request.payload.rideId
+                });
+
+                if (itemAdded) {
+                    return returnObject(true, `You're signed up to drive for this ride!`);
+                } else {
+                    return returnObject(false, `Something went wrong signing you up`);
+                }
+
             }
         }
     ]);
