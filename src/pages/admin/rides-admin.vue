@@ -3,10 +3,12 @@
         <div>
             <h4 class="display-2 mb-2 ml-1">Ride Management</h4>
 
-            <div>
-                <v-btn color="primary" class="ma-1" @click="showAddRide">Create new ride</v-btn>
-                <v-btn color="primary" class="ma-1" @click="showAddLocation">Add new location</v-btn>
-            </div>
+            <v-card>
+                <v-card-text>
+                    <v-btn color="primary" class="ma-1" @click="showAddRide">Create new ride</v-btn>
+                    <v-btn color="primary" class="ma-1" @click="showAddLocation">Add new location</v-btn>
+                </v-card-text>
+            </v-card>
 
             <v-data-table
                     class="elevation-1 ma-1"
@@ -75,7 +77,7 @@
             </v-data-table>
 
             <div class="text-xs-center">
-                <v-dialog v-model="addRideVisible">
+                <v-dialog v-model="addRideVisible" width="1000">
                     <v-card>
                         <v-card-title primary-title>
                             Create a new ride
@@ -181,7 +183,7 @@
             </div>
 
             <div class="text-xs-center">
-                <v-dialog v-model="editRideVisible">
+                <v-dialog v-model="editRideVisible" width="1000">
                     <v-card>
                         <v-card-title primary-title>
                             Edit ride
@@ -286,7 +288,7 @@
             </div>
 
             <div class="text-xs-center">
-                <v-dialog v-model="addLocationVisible">
+                <v-dialog v-model="addLocationVisible" width="1000">
                     <v-card>
                         <v-card-title primary-title>
                             Add a new location

@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <div>
-            <v-btn v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
+            <v-btn color="primary" text v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
             <br><br>
             <h2>First, we need to know who you are.</h2>
             <v-menu offset-y>

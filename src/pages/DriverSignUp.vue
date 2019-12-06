@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <div>
-            <v-btn v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
+            <v-btn color="primary" text v-bind:to="{ name: 'driver' }">&lt; Back</v-btn>
             <br><br><h4 class="display-1">Driver Sign-Up</h4>
 
             <v-form v-model="valid">
