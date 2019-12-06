@@ -119,6 +119,17 @@ async function init() {
             }
         },
         {
+            method: "PUT",
+            path: "/rides/findByVehicle",
+            options: {
+                description: "View all rides whose vehicle are in the validVehicleIds array"
+            },
+            handler: (request) => {
+                let ids = request.payload.validVehicleIds;
+                return Ride.query().whereIn("vehicleid", ids);
+            }
+        },
+        {
             method: "GET",
             path: "/vehicles",
             options: {
@@ -138,6 +149,7 @@ async function init() {
                         make: Joi.string().required(),
                         model: Joi.string().required(),
                         color: Joi.string().required(),
+                        typeId: Joi.number().integer().min(1).required(),
                         capacity: Joi.number().integer().min(0).required(),
                         mpg: Joi.number().integer().min(0).required(),
                         licenseState: Joi.string().required(),
@@ -218,16 +230,14 @@ async function init() {
                 return Authorization.query().select("driverid").where("vehicleid", request.params.vehicleId);
             }
         },
-        {//need to join to authorization table on vehicleid to then match driverid from selected driver to authorized driver
+        {
             method: "GET",
-            path: "/ride/{driverID}",
+            path: "/authorization/driver/{driverId}",
             options: {
-                description: "Fetch rides for which the drivers is authorized"
+                description: "Get all vehicleIds the driver is authorized for"
             },
-            handler: (request) => {
-                return Ride.query()
-                    .join("authorization", 'ride.vehicleid', '=', 'authorization.vehicleid')
-                    .where('authorization.driverid', '=', request.params.driverID)
+            handler: async (request) => {
+                return Authorization.query().select("vehicleid").where("driverid", request.params.driverId);
             }
         },
         {

@@ -650,6 +650,7 @@
                 }
                 if (this.rideAdded) {
                     this.hideAddRide();
+                    this.getRides();
                 }
             },
 

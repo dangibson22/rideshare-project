@@ -5,13 +5,13 @@
             <br><br>
             <v-menu offset-y>
                 <template v-slot:activator="{ on }">
-                    <v-btn text v-on="on">
+                    <v-btn color="primary" v-on="on">
                         <span>{{ currentDriverString }}</span>
                         <v-icon dark>mdi-menu-down</v-icon>
                     </v-btn>
                 </template>
                 <v-list>
-                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id">
+                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id" @click="updateCurrent(driver)">
                         <span>{{ getDriverString(driver) }}</span>
                     </v-list-item>
                 </v-list>
@@ -22,71 +22,6 @@
                     v-bind:headers="headers"
                     v-bind:items="rides"
             >
-                <template v-slot:item="{ item }">
-                    <tr>
-                        <td>{{ item.make }}</td>
-                        <td>{{ item.model }}</td>
-                        <td>{{ item.color }}</td>
-                        <td>{{ item.licenseNumber }}</td>
-                        <td>
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn
-                                            color="primary"
-                                            small
-                                            dark
-                                            class="ma-1"
-                                            v-on="on"
-                                            @click="showEdit(item)"
-                                    >
-                                        <v-icon> mdi-pencil</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>Edit vehicle</span>
-                            </v-tooltip>
-
-
-                            <v-menu>
-                                <template #activator="{ on: menu }">
-                                    <v-tooltip bottom>
-                                        <template #activator="{ on: tooltip }">
-                                            <v-btn
-                                                    color="primary"
-                                                    small
-                                                    dark
-                                                    class="ma-1"
-                                                    v-on="{ ...tooltip, ...menu }"
-                                            >
-                                                <v-icon>mdi-plus</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <span>Add authorized driver</span>
-                                    </v-tooltip>
-                                </template>
-                                <v-list>
-                                    <v-list-item v-for="driver in drivers" v-bind:key="driver.id">
-                                        {{ getDriverString(driver) }}
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-
-                            <v-tooltip bottom>
-                                <template v-slot:activator="{ on }">
-                                    <v-btn
-                                            color="primary"
-                                            small
-                                            dark
-                                            class="ma-1"
-                                            v-on="on"
-                                    >
-                                        <v-icon>mdi-view-headline</v-icon>
-                                    </v-btn>
-                                </template>
-                                <span>View authorized drivers</span>
-                            </v-tooltip>
-                        </td>
-                    </tr>
-                </template>
             </v-data-table>
         </div>
     </v-container>
@@ -108,6 +43,8 @@ export default {
             currentDriverString: "Choose a driver",
 
             drivers: [],
+            validVehicleIds: [],
+
 
             headers: [
                 { text: "Date", value: "date"},
@@ -119,22 +56,34 @@ export default {
     },
 
     mounted: function() {
-        this.$axios.get("/driver").then(response => {
-            this.drivers = response.data.map(thisDriver => ({
-                firstName: thisDriver.firstname,
-                lastName: thisDriver.lastname,
-                phone: thisDriver.phone,
-                licenseNumber: thisDriver.licensenumber,
-                id: thisDriver.id,
-            }));
-            console.log("mapped");
-        })
+        this.getDrivers();
     },
 
     methods: {
-        updateCurrent(thisDriver) {
+        updateCurrent: async function(thisDriver) {
             this.currentDriver = thisDriver;
             this.currentDriverString = this.getDriverString(thisDriver);
+            this.findValidVehicles(thisDriver.id);
+        },
+
+        findValidVehicles: async function(id) {
+            await this.$axios.get(`/authorization/driver/${id}`).then(response => {
+                for (var i = 0; i < response.data.length; i++) {
+                    this.validVehicleIds.push(Number(response.data[i].vehicleid));
+                }
+            })
+        },
+
+        getDrivers: function() {
+            this.$axios.get("/driver").then(response => {
+                this.drivers = response.data.map(thisDriver => ({
+                    firstName: thisDriver.firstname,
+                    lastName: thisDriver.lastname,
+                    phone: thisDriver.phone,
+                    licenseNumber: thisDriver.licensenumber,
+                    id: thisDriver.id,
+                }));
+            })
         },
 
         getDriverString(thisDriver) {
